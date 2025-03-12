@@ -27,6 +27,7 @@
 </head>
 
 <body>
+    <!-- 3d explorer -->
     <div class="mapControlsContainer">
         <i class="fa fa-eye" style="font-size:24px;"></i>
         <!-- <i class="fa fa-map fa-2xl"></i> -->
@@ -40,10 +41,14 @@
             </button>
         </div>
     </div>
+
+    <!-- Aside from 3d exploration everything else -->
     <div class="containerRow">
         <div class="canvasColumn">
             <canvas class="webgl"></canvas>
         </div>
+
+        <!-- Perception Tab -->
         <div class="uiColumn">
             <div class="defaultContainer">
                 <div class="userQueries">
@@ -56,6 +61,7 @@
                             onclick="experience.queryTabs.openQuery(event, 'building')">Building Materials</button>
                     </div>
                     <div class="queryContainer">
+                        <!-- Slider for Semantics -->
                         <div class="querySliders">
                             <div class="slider"></div>
                         </div>
@@ -155,6 +161,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Scatter plot -->
             <div class="defaultContainer graphsContainer">
                 <!-- <div class="graphsContent">
                     This is the graph content.
@@ -190,13 +198,18 @@
                 <div id="HiddenMap">
                 </div>
             </div>
+
+            <!-- Gallery -->
             <div class="defaultContainer galleryContainer">
                 <div class="galleryContent">
                 </div>
             </div>
 
         </div>
+
+
     </div>
+
     <div class="graphsContainer" style="display: none;">
         <div class="residualsContainer">
             <span>Residuals</span>

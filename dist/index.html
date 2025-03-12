@@ -24,7 +24,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <script type="module" crossorigin src="./assets/index-1c9b3419.js"></script>
+  <script type="module" crossorigin src="./assets/index-ed856e93.js"></script>
   <link rel="stylesheet" href="./assets/index-a7522ff1.css">
 </head>
 
@@ -63,15 +63,15 @@
                         </div>
                         <div class="queryOpenessSliders" hidden>
                             <div class="queryOpenessSlidersCol">
-                                <label for="greeness">greeness</label>
-                                <form id="greeness-form" class="sliderRow">
-                                    <i class="fa fa-trash" style="font-size:18px;" onclick="experience.world.removeFromParameter('greeness')"></i>
-                                    <input name="greenessRange"
+                                <label for="greenness">greenness</label>
+                                <form id="greenness-form" class="sliderRow">
+                                    <i class="fa fa-trash" style="font-size:18px;" onclick="experience.world.removeFromParameter('greenness')"></i>
+                                    <input name="greennessRange"
                                         onchange="experience.world.getOpenessParameters(this.value, this.id)"
-                                        id="greeness" type="range" min="0" max="100" value="50"
-                                        oninput="this.form.greenessAmount.value=this.value">
-                                    <input type="number" name="greenessAmount" min="0" max="100" value="50"
-                                        oninput="this.form.greenessRange.value=this.value" />
+                                        id="greenness" type="range" min="0" max="100" value="50"
+                                        oninput="this.form.greennessAmount.value=this.value">
+                                    <input type="number" name="greennessAmount" min="0" max="100" value="50"
+                                        oninput="this.form.greennessRange.value=this.value" />
                                 </form>
 
                                 <label for="openness">openness</label>
