@@ -178,25 +178,7 @@ export default class RayCaster {
             const rotZ = THREE.MathUtils.radToDeg(euler.z);
 
             // Output
-            console.log(`Side: [${p1.x}, ${p1.y}, ${p1.z}] - [${p2.x}, ${p2.y}, ${p2.z}]`, "Perpendicular orientation:", rotX, rotY, rotZ);
-
-            /* Spherical Coordinates:
-            // Compute direction from p1 to p2
-            const direction = new THREE.Vector3().subVectors(p2, p1).normalize();
-
-            // Compute a perpendicular vector in the XZ plane (assuming Y-up)
-            const up = new THREE.Vector3(0, 1, 0);  // World up
-            const perpendicular = new THREE.Vector3().crossVectors(direction, up).normalize();
-
-            // Convert perpendicular direction to spherical coordinates
-            const spherical = new THREE.Spherical().setFromVector3(perpendicular);
-
-            const theta = THREE.MathUtils.radToDeg(spherical.theta); // Yaw angle (horizontal)
-            const phi = THREE.MathUtils.radToDeg(spherical.phi); // Pitch angle (vertical)
-
-            console.log(`Side [${p1.x},${p1.y},${p1.z}] - [${p2.x},${p2.y},${p2.z}]  has: Theta (Yaw): ${theta} degrees, Phi (Pitch): ${phi} degrees`);
-            ////////
-            */
+            // console.log(`Side: [${p1.x}, ${p1.y}, ${p1.z}] - [${p2.x}, ${p2.y}, ${p2.z}]`, "Perpendicular orientation:", rotX, rotY, rotZ);
         }
 
         
@@ -205,8 +187,8 @@ export default class RayCaster {
             .then(res => {
                 console.log(res.data)
                 console.log("Displaying the building tiles...")
-                // this.particleHelper.resetResultPoints()
-                // this.particleHelper.plotParticlesForVisibilityEnconderResult(res.data)
+                this.particleHelper.resetResultPoints()
+                this.particleHelper.plotParticlesForVisibilityEnconderResult(res.data)
             })
             .catch(err => {
                 console.log('Error: ', err.message)
@@ -339,6 +321,7 @@ export default class RayCaster {
         console.log(this.helper)
         console.log(obb)
         console.log("Created Bonding boxes")
+        this.guiFacadeControls.facadeTiles = null
 
         this.clickedBuildingHeight = obb.halfSizes.y * 2
         this.clickedBuildingCenter = obb.center
@@ -457,7 +440,72 @@ export default class RayCaster {
             ]
         )
     }
+
+    callGetFacadesForClickedBuildingAsContinousTiles() {
+        const basePoint = this.pointsByNormal.get('[0,-1,0]')
+
+        console.log({basePoint})
+        console.log("Clicked building height:", this.clickedBuildingHeight)
+        let points = basePoint.map(b => new THREE.Vector3(b[0],b[1],b[2]))
+        points = this.sortPointsClockwise(points)
+        
+        console.log("Angle to faces are actually roatated with 90deg.")
+        /// Computing viewing angles for each side:
+        for (let i=0; i<4; i++){
+            // console.log(points[i], points[(i+1) % 4])
+            let p1 = points[i]
+            let p2 =  points[(i+1) % 4]
+
+            // Compute direction vector
+            // const direction = new THREE.Vector3().subVectors(p2, p1).normalize();
+            const direction = new THREE.Vector3().subVectors(p1, p2).normalize();
+
+            // Choose a reference up vector (avoid collinear cases)
+            const worldUp = new THREE.Vector3(0, 1, 0);
+            if (Math.abs(direction.dot(worldUp)) > 0.99) {
+                // If collinear, choose another reference
+                worldUp.set(1, 0, 0);
+            }
+
+            // Compute perpendicular right vector
+            const right = new THREE.Vector3().crossVectors(worldUp, direction).normalize();
+
+            // Compute new "up" vector to maintain orthogonality
+            const up = new THREE.Vector3().crossVectors(direction, 1).normalize();
+
+            // Create rotation matrix
+            const rotationMatrix = new THREE.Matrix4();
+            rotationMatrix.makeBasis(right, up, direction); // Aligns with p1->p2
+
+            // Extract Euler angles (optional)
+            const euler = new THREE.Euler().setFromRotationMatrix(rotationMatrix, 'YXZ');
+            const rotX = THREE.MathUtils.radToDeg(euler.x);
+            const rotY = THREE.MathUtils.radToDeg(euler.y);
+            const rotZ = THREE.MathUtils.radToDeg(euler.z);
+
+            // Output
+            // console.log(`Side: [${p1.x}, ${p1.y}, ${p1.z}] - [${p2.x}, ${p2.y}, ${p2.z}]`, "Perpendicular orientation:", rotX, rotY, rotZ);
+        }
+
+        
+
+        this.visibilityEncoderService.predictFacadeFromBasePointsAsContinousTiles(basePoint, this.clickedBuildingHeight)
+            .then(res => {
+                console.log(res.data)
+                console.log("Displaying the building tiles...")
+                // this.guiFacadeControls.resetResultPoints()
+                // this.particleHelper.plotParticlesForVisibilityEnconderResult(res.data)
+                this.guiFacadeControls.addTilesToScene(res.data);
+                console.log("Semantic ID: ", this.guiFacadeControls.sliderValue, " representing ", this.guiFacadeControls.semanticName)
+                
+            })
+            .catch(err => {
+                console.log('Error: ', err.message)
+            })
+    }
+
     setGUI() {
+
         this.gui.dataGenerationFolder.add({
             screenShotSelectedBuilding: () => {
                 this.screenShotBuilding()
@@ -476,11 +524,117 @@ export default class RayCaster {
             }
         }, 'callGetFacadesForClickedBuilding')
 
+        // Object to store values
+        this.guiFacadeControls = {
+            sliderValue: 0,
+            semanticName:"",
+            textValue: "",
+            tileMeshes: [],
+            facadeTiles: null,
+            addTilesToScene : function addTilesToScene(tilesData) {
+                this.facadeTiles = tilesData
+                this.removeTilesFromScene()
+                tilesData.forEach(tile => {
+                    // console.log({tile})
+                    const { center, dimension, colors, points} = tile;
+                    let side_length = dimension
+                    // console.log({center, side_length, colors, points})
+                    let color = ""
+                    if(this.textValue in colors){
+                        color = colors[this.textValue]
+                        // console.log("Semantic: ", this.textValue)
+                    }
+                    else{
+                        let semantic_by_id = Object.keys(colors)[this.sliderValue]
+                        color = colors[semantic_by_id]
+                        this.semanticName = semantic_by_id
+                        //console.log("Semantic ID: ", this.sliderValue, " representing ", semantic_by_id)
+                    }
+                    // console.log({side_length})
+                    // side_length = side_length * 0.99
+                    // console.log({side_length})
+                    // Compute normal vector from three random points
+                    const p0 = new THREE.Vector3(...points[0]);
+                    const p1 = new THREE.Vector3(...points[1]);
+                    const p2 = new THREE.Vector3(...points[2]);
+
+                    const v1 = new THREE.Vector3().subVectors(p1, p0);
+                    const v2 = new THREE.Vector3().subVectors(p2, p0);
+                    const normal = new THREE.Vector3().crossVectors(v1, v2).normalize();
+                    
+                    // Create a square tile geometry
+                    const geometry = new THREE.PlaneGeometry(side_length, side_length);
+                    // const geometry = new THREE.PlaneGeometry(10., 10.);
+                    const material = new THREE.MeshBasicMaterial({ color: new THREE.Color(color), side: THREE.DoubleSide });
+                    const tileMesh = new THREE.Mesh(geometry, material);
+              
+                    // Position the tile using its center
+                    tileMesh.position.set(center[0], center[1], center[2]);
+
+                    // If the tile needs rotation, compute it (assuming normal vector is given or inferred)
+                    // if (tile.normal) {
+                        // const normal = new THREE.Vector3(tile.normal[0], tile.normal[1], tile.normal[2]).normalize();
+                    const up = new THREE.Vector3(0, 0, 1); // Default plane normal
+                    const quaternion = new THREE.Quaternion().setFromUnitVectors(up, normal);
+                    tileMesh.applyQuaternion(quaternion);
+                    // }
+
+                    // Add tile to the scene
+                    this.scene.add(tileMesh);
+                    this.tileMeshes.push(tileMesh);
+                });
+            },
+            removeTilesFromScene : function removeTilesFromScene() {// Function to remove all tiles from the scene
+                console.log(`Removing existing ${this.tileMeshes.length} tiles from scene...`)
+                this.tileMeshes.forEach(mesh => {
+                this.scene.remove(mesh);      // Remove from scene
+                mesh.geometry.dispose(); // Free memory
+                mesh.material.dispose(); // Free memory
+              });
+              this.tileMeshes = []; // Clear the array
+            },
+            scene : this.experience.scene,
+            displayFacade: function () {
+                if(this.facadeTiles == null){
+                    fetch('building_tiles_sample.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.addTilesToScene(data);
+                    })
+                    .catch(error => console.error('Error loading JSON:', error));              
+                }
+                else{
+                    this.addTilesToScene(this.facadeTiles) 
+                }
+                console.log("Semantic ID: ", this.sliderValue, " representing ", this.semanticName)
+            }
+        };
+        this.gui.facadesFolder.add(this.guiFacadeControls, 'sliderValue', 0, 7, 1) // Min: 0, Max: 100, Step: 1
+            .name("Semantic ID")
+            .onChange(value => console.log("New Semantic ID: ", value));
+        // Add text input
+        this.gui.facadesFolder.add(this.guiFacadeControls, 'textValue').name("Semantic Name:");
+
+        // Add button to log text
+        this.gui.facadesFolder.add(this.guiFacadeControls, 'displayFacade').name("Display Facade");
+
+        // Add button to log text
+        this.gui.facadesFolder.add(this.guiFacadeControls, 'removeTilesFromScene').name("Remove Tiles");
+
+
+        
+
         this.gui.endpointsFolder.add({
             callGetFacadesForClickedBuildingV2AsTiles: () => {
                 this.callGetFacadesForClickedBuildingV2AsTiles()
             }
         }, 'callGetFacadesForClickedBuildingV2AsTiles')
+
+        this.gui.facadesFolder.add({
+            getClickedBuildingFacadeAsContinousTiles: () => {
+                this.callGetFacadesForClickedBuildingAsContinousTiles()
+            }
+        }, 'getClickedBuildingFacadeAsContinousTiles')
 
 
         this.gui.endpointsFolder.add({
@@ -488,6 +642,61 @@ export default class RayCaster {
                 this.callTestEnconderOnData()
             }
         }, 'callTestEnconderOnData')
+
+        ////////////////////////////////////////Sample Controls
+        ////Sample input parsing three JS
+        // Object to store values
+        const guiControls = {
+            sliderValue: 0,
+            textValue: "",
+            logText: function () {
+                console.log("User Input:", this.textValue);
+            }
+        };
+        this.gui.sampleControls.add(guiControls, 'sliderValue', 0, 10, 1) // Min: 0, Max: 100, Step: 1
+            .name("Slider")
+            .onChange(value => console.log("Slider Value:", value));
+        // Add text input
+        this.gui.sampleControls.add(guiControls, 'textValue').name("Enter Text");
+
+        // Add button to log text
+        this.gui.sampleControls.add(guiControls, 'logText').name("Log Text");
+
+        this.gui.sampleControls.add({
+            sampleTilesDisplay: () => {
+                console.log("colsoleLoggingTest")
+                fetch('tiles_sample.json')
+                .then(response => response.json())
+                .then(tiles => {
+                  tiles.forEach(tile => {
+                    const { center, dimension, points, color } = tile;
+              
+                    // Create the tile (square) using the dimension
+                    const geometry = new THREE.PlaneGeometry(dimension, dimension);
+                    const material = new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide });
+                    const plane = new THREE.Mesh(geometry, material);
+              
+                    // Position it at the center
+                    plane.position.set(...center);
+              
+                    // Rotate it if needed (for a horizontal tile facing up)
+                    plane.rotation.x = -Math.PI / 2;
+              
+                    this.experience.scene.add(plane);
+              
+                    // Create small spheres for the random points
+                    const pointMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                    points.forEach(point => {
+                      const sphereGeometry = new THREE.SphereGeometry(0.05);
+                      const sphere = new THREE.Mesh(sphereGeometry, pointMaterial);
+                      sphere.position.set(...point);
+                      this.experience.scene.add(sphere);
+                    });
+                  });
+                })
+                .catch(error => console.error("Error loading tiles:", error));
+            }
+        }, 'sampleTilesDisplay')
 
     }
     update() {

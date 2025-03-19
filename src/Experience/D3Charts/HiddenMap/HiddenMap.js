@@ -106,6 +106,7 @@ export default class HiddenMap {
             global_locations = data;
             selected_locations = global_locations;
 
+            //Kazi 3D
             this.displayGlobalLocations();
 
             console.log("Populating hidden map with ", global_locations.length, " locations.")
@@ -403,6 +404,7 @@ export default class HiddenMap {
                 particlesToPlot = particlesToPlot.concat(queryParticlesToPlot)
             }
 
+            //Kazi 3D:
             this.experience.queryLocationParticles = this.particleHelper.plotParticles(particlesToPlot)
 
 
@@ -410,7 +412,6 @@ export default class HiddenMap {
             let povStyleLocations = { data: selected_query_locations }
             // let povStyleLocations = selected_query_locations
             console.log({ povStyleLocations })
-
             this.experience.world.updatePovInterfaceAfterBrushOnHistogram(povStyleLocations)
             // this.experience.world.updatePovInterfaceAfterBrushOnHistogram(selected_query_locations);
             console.log({ selected_locations }); // For debugging purposes

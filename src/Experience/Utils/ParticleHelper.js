@@ -89,7 +89,6 @@ export default class ParticleHelper extends EventEmitter {
 
         this.lastResult = result;
         this.trigger("updatedQueryResult");
-
         this.lookAtResults = [
             {
                 // we divide by 6 because we have 6 lookAt positions
@@ -129,8 +128,14 @@ export default class ParticleHelper extends EventEmitter {
             },
 
         ]
-        for (let i = 0; i < result.length;) {
+        console.log("Result examples:", result[0], result[result.length-1])
+        for (let i = 0; i < result.length - result.length%6;) {
+            //console.log("Result examples, before crushing:", result[i])
+            
             for (let j = 0; j < 6; j++) { // we have 6 lookAt positions
+                // if (i == result.length){
+                //     break
+                // }
                 const lookAtIndex = Math.floor(i / 6) * 3
                 this.lookAtResults[j].positions[lookAtIndex + 0] = result[i].camera_coordinates[0]
                 this.lookAtResults[j].positions[lookAtIndex + 1] = result[i].camera_coordinates[1]
@@ -146,6 +151,7 @@ export default class ParticleHelper extends EventEmitter {
                 this.lookAtResults[j].colors[lookAtIndex + 2] = color[2]
                 i++
             }
+            
         }
         this.lookAtResults.forEach(result => {
             result.geometry.setAttribute(
