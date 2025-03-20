@@ -41,7 +41,7 @@ export default class MultiThumbSlider {
     }
 
     onSliderSelect(event, sliderThumb) {
-        console.log(this.tags);
+        // console.log(this.tags);
         document.body.style.cursor = 'ew-resize';
 
         let tagIndex = parseInt(sliderThumb.parentNode.getAttribute('data-tag-index'));
@@ -98,7 +98,7 @@ export default class MultiThumbSlider {
             document.body.style.cursor = 'initial';
             // Send new query values to World
             experience.world.setQueryParameters(this.tags);
-            console.log(this.tags);
+            // console.log(this.tags);
             removeEventListener();
         };
 

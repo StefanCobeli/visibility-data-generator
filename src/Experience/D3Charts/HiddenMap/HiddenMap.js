@@ -191,8 +191,8 @@ export default class HiddenMap {
 
         const svg = d3.select("#HiddenMap")
         const selection = event.selection;
-        console.log("Selection computed in brushed()", selection);
-
+        // console.log("Selection computed in brushed()", selection);
+// 
         if (!selection) {
             // Reset selection
             // selected_locations = [];
@@ -224,7 +224,7 @@ export default class HiddenMap {
         // .each(d => selected_locations.push(d));
 
         // console.log("Selected Heatmap Points:", selected_locations);
-        console.log(svg.selectAll(".scatter-point"))
+        // console.log(svg.selectAll(".scatter-point"))
         // Update selected points for scatter plot (query.json)
         svg.selectAll(".scatter-point")
             .style("fill", colorQuery)

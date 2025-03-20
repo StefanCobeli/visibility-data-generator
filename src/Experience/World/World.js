@@ -55,7 +55,7 @@ export default class World {
             const percentage = val['value'] / 100;
             this.queryParameters[name] = percentage;
         })
-        console.log(this.queryParameters);
+        // console.log(this.queryParameters);
     }
     initializeOpenessParameters() {
         const slidersRows = document.getElementsByClassName('sliderRow')
@@ -95,6 +95,7 @@ export default class World {
         }
     }
     callQueryLocation() {
+        this.queryLocationParameters.numLocations.value = parseInt(document.querySelector('#numLocations').value)
         this.visibilityEncoderService.queryLocation(
             this.queryLocationParameters.numLocations.value,
             1,
