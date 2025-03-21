@@ -60,8 +60,8 @@ export default class RayCaster {
                 this.previousClicked = this.clickedBuilding
                 this.clickedBuilding = this.hoveredBuilding
 
-                // console.log(this.clickedBuilding);
                 console.log("Building clicked")
+                console.log(this.clickedBuilding);
 
                 const points = createArrayOfPointsFromGroup(this.clickedBuilding)
 
@@ -597,6 +597,7 @@ export default class RayCaster {
             displayFacade: function () {
                 if(this.facadeTiles == null){
                     fetch('building_tiles_sample.json')
+                    // fetch('building_tiles_global.json')
                     .then(response => response.json())
                     .then(data => {
                         this.addTilesToScene(data);

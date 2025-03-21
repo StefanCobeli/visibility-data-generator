@@ -118,7 +118,9 @@ export default class Experience {
             //     console.log("buildingMeshes:", this.buildingMeshes);
             // }, 40000)
             ///Actually downloading the building data:
-            this.downloadBuildingsData(40000) //Set a timeout enough for full model to be loaded on the interface.
+            let downloadTimeout = 40000 //40000 is 40s in miliseconds
+            // let downloadTimeout = 5000 // 5000 is 5s
+            this.downloadBuildingsData(downloadTimeout) //Set a timeout enough for full model to be loaded on the interface.
         }
         
         // this.hiddenMap.createHiddenMap(); 
@@ -139,6 +141,25 @@ export default class Experience {
         console.log(Array.isArray(this.buildingMeshes))
 
         setTimeout(() => {
+            // this.buildingMeshes.forEach(child => {
+            //     const geometry = child.geometry.toNonIndexed()
+            //     const position = geometry.getAttribute('position')
+            //     for (let i = 0; i < position.array.length; i += 3) {
+            //         let index = i / 3
+            //         // console.log({position})
+        
+            //         const vertex = new THREE.Vector3()
+            //         vertex.fromBufferAttribute(position, index)
+            //         child.localToWorld(vertex)
+            //         // console.log({child})
+            //         // console.log({vertex}, {index})
+        
+            //         points.push(new YUKA.Vector3(...vertex))
+        
+            //     }
+            // })
+            // console.log("Created Array of Points from the Group - helpers.js")
+            
             console.log("Waited logging")
             console.log(this.buildingMeshes[0]); // Logs: [1, 2, 3]
             console.log(this.buildingMeshes.length); // Logs: [1, 2, 3]
@@ -149,7 +170,9 @@ export default class Experience {
                 Object.assign({}, 
                     mesh.userData, 
                     {"Local Location": mesh.geometry.boundingSphere ? mesh.geometry.boundingSphere.center : new THREE.Vector3(0,0,0) },
-                    {"World Location": mesh.geometry.boundingSphere ? mesh.localToWorld(mesh.geometry.boundingSphere.center) : new THREE.Vector3(0,0,0)}
+                    {"World Location": mesh.geometry.boundingSphere ? mesh.localToWorld(mesh.geometry.boundingSphere.center) : new THREE.Vector3(0,0,0)},
+                    mesh.geometry,
+                    {"World Points" : this.extractWorldCoordinatesFromMeshGeometries(mesh)}
                 ))
             console.log(buildingData)
             const jsonBuildingData = JSON.stringify(buildingData, null, 4);
@@ -164,6 +187,31 @@ export default class Experience {
             URL.revokeObjectURL(url); // Release the URL object to free memory
 
         }, timeout);
+    }
+
+    extractWorldCoordinatesFromMeshGeometries(mesh){
+        const points = []
+        // console.log({mesh})
+        // console.log(mesh.geometry)
+        let geometries = mesh.geometry
+        // console.log("Mesh childres:", mesh.children)
+        // console.log(mesh.geometries.geometry.attributes.position.array)
+        let positions = geometries.attributes.position.array
+        for (let i = 0; i < positions.length; i += 3) {
+            let index = i / 3
+            // console.log({position})
+
+            const vertex = new THREE.Vector3(positions[index], positions[index+1], positions[index+2])
+            // vertex.fromBufferAttribute(position, index)
+            mesh.localToWorld(vertex)
+            // console.log({child})
+            // console.log({vertex}, {index})
+
+            points.push(vertex)
+
+        }
+        // console.log("Created Array of Points from the Group - helpers.js")
+        return points
     }
 
     setGUI() {
