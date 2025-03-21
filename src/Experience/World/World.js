@@ -122,7 +122,7 @@ export default class World {
         let goals = this.queryParameters
         if (this.isPerception) {
             const opennessPayload = {}
-
+            //Kazi passing query parameters to backed
             for (const key in this.queryParameters) {
                 const expression = predefinedFormulaLibrary[key]["expression"]
                 const value = this.queryParameters[key]

@@ -93,6 +93,7 @@ export default class MultiThumbSlider {
 
             this.emitEvent();
         };
+        //Kazi passing query parameters to backed
         let onEventUp = (event) => {
             event.preventDefault();
             document.body.style.cursor = 'initial';
