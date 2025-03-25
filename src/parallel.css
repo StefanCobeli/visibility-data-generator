@@ -1,0 +1,143 @@
+/* Styling for your container and chart */
+#category-header {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.category-tab {
+  color: #aaa;
+  font-weight: normal;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.category-tab.selected {
+  color: #7570b3;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+#container-pcp {
+  width: 100%;
+  height: 100%;
+  font-family: "Roboto", sans-serif;
+}
+
+#axis-buttons-pcp {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.axis-btn-pcp {
+  margin: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: 1px solid #7570b3;
+  background-color: #fff;
+  border-radius: 4px;
+  color: #7570b3;
+}
+
+.axis-btn-pcp.active-axis-pcp {
+  background-color: #7570b3;
+  color: white;
+}
+
+#chart-pcp {
+  position: relative;
+  width: 100%;
+}
+
+#chart-pcp canvas,
+#chart-pcp svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#chart-pcp .brush rect.extent {
+  fill: rgba(100, 100, 100, 0.15);
+  stroke: #fff;
+}
+
+#chart-pcp .brush:hover rect.extent {
+  stroke: #222;
+  stroke-dasharray: 5, 5;
+}
+#chart-pcp .brush rect.extent:hover {
+  stroke-dasharray: none;
+}
+#chart-pcp .resize rect {
+  fill: none;
+}
+.background {
+  fill: none;
+}
+
+#chart-pcp .axis line,
+#chart-pcp .axis path {
+  fill: none;
+  stroke: #777;
+  stroke-width: 1;
+}
+
+#chart-pcp .axis .tick {
+  width: 200px;
+}
+#chart-pcp .axis text {
+  fill: #111;
+  text-anchor: right;
+  font-size: 13px;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+#chart-pcp .axis text.label {
+  font-size: 14px;
+  cursor: move;
+  padding-bottom: 24px;
+}
+
+#controls-pcp,
+#controls-pcp-building {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8em;
+  margin-top: 5px;
+  font-size: 14px;
+  max-width: fit-content;
+  margin: auto;
+  margin-right: auto;
+}
+
+/* Checkbox size and color */
+#plane-checkbox {
+  transform: scale(1.3);
+  accent-color: #7570b3;
+}
+
+/* Number input size */
+#num-locations {
+  width: 30px;
+  padding: 0.2em 0.4em;
+  font-size: 1em;
+}
+
+/* Button styling */
+.userButton {
+  padding: 0.6em 1em;
+  border: 1px solid #5650a7;
+  background-color: #fff;
+  color: #5650a7;
+  /* border: none; */
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* #chart-pcp {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15); 
+  border-radius: 10px; 
+} */

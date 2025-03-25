@@ -4,11 +4,89 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 html,
 body {
+  font-family: "Roboto", sans-serif;
+  height: 100%;
+  margin: 0;
   overflow: hidden;
+}
+
+.main-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.left-panel {
+  width: 53%;
+  background-color: #add8e6; /* light blue */
+  display: flex;
+  flex-direction: column;
+}
+
+.left-top {
+  height: 60%;
+  background-color: #87cefa; /* lighter blue */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // font-size: 20px;
+}
+
+.left-bottom {
+  height: 40%;
+  background-color: #b0e0e6; /* pale turquoise */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // font-size: 20px;
+}
+
+.right-panel {
+  width: 47%;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-box {
+  // padding: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.box1 {
+  height: 50%;
+  background-color: none;
+  overflow: auto;
+}
+
+.box2 {
+  height: 50%;
+  background-color: none;
+  // border: 1px solid black;
+}
+
+.left-top,
+.left-bottom,
+.box1,
+.box2 {
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 5px; /* adds spacing between containers */
+}
+
+/* Remove extra spacing at edges if needed */
+.left-panel,
+.right-panel {
+  padding: 2px;
+  gap: 2px; /* optional, for cleaner flex gap */
 }
 
 .webgl-global0 {
@@ -18,7 +96,7 @@ body {
   height: 32vh;
   width: 16vh;
   outline: none;
-  border: 3px solid black
+  border: 3px solid black;
 }
 
 .webgl-global1 {
@@ -28,7 +106,7 @@ body {
   height: 32vh;
   width: 16vh;
   outline: none;
-  border: 3px solid black
+  border: 3px solid black;
 }
 
 .webgl-global2 {
@@ -38,7 +116,7 @@ body {
   height: 16vh;
   width: 32vh;
   outline: none;
-  border: 3px solid black
+  border: 3px solid black;
 }
 
 .loading-bar {
@@ -129,11 +207,11 @@ footer {
 
 h1 {
   font-size: 96px;
-  margin-top: .3em;
+  margin-top: 0.3em;
   margin-bottom: 0;
 }
 
-h1+h2 {
+h1 + h2 {
   margin-top: 0;
 }
 
@@ -148,7 +226,7 @@ h2 {
   text-rendering: optimizeLegibility;
 }
 
-#body>p {
+#body > p {
   line-height: 1.5em;
   width: 640px;
   text-rendering: optimizeLegibility;
@@ -191,7 +269,7 @@ h2 {
 
 .brush rect.extent {
   fill: steelblue;
-  fill-opacity: .125;
+  fill-opacity: 0.125;
 }
 
 .brush .resize path {
@@ -221,7 +299,7 @@ h2 {
 
 #flight-list .date,
 #flight-list .day {
-  margin-bottom: .4em;
+  margin-bottom: 0.4em;
 }
 
 #flight-list .flight {
@@ -288,9 +366,9 @@ aside {
 }
 
 .canvasColumn {
-  width: 100vh;
-  height: 100vh;
-  padding: 5px;
+  width: 100%;
+  height: 100%;
+  // padding: 5px;
 }
 
 .webgl {
@@ -329,12 +407,14 @@ aside {
 .defaultContainer {
   margin: 5px 10px 5px 0px;
   padding: 5px 10px;
-  display: flex;
-  flex-direction: row;
-  height: 30vh;
+
+  height: 50vh;
   border-radius: 5px;
   box-shadow: 0px 0px 10px 0px #00000040;
-  background-color: #fff;
+  display: flex;
+  align-items: flex-start; /* align content to top */
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .controlsContainer {
@@ -364,7 +444,7 @@ aside {
   /* color: white; */
   color: #272343;
 
-  font-family: 'PT Sans Narrow';
+  font-family: "PT Sans Narrow";
   font-size: 14px;
 
   box-sizing: border-box;
@@ -374,8 +454,8 @@ aside {
 
   height: 40px;
 
-  background: #FFFFFF;
-  border: 1px solid #DAD9D9;
+  background: #ffffff;
+  border: 1px solid #dad9d9;
   border-radius: 8px;
 
   cursor: pointer;
@@ -399,7 +479,7 @@ aside {
 }
 
 .tabButton {
-  font-family: 'PT Sans Narrow';
+  font-family: "PT Sans Narrow";
   font-size: 14px;
   padding: 4px 12px;
   background-color: transparent;
@@ -435,7 +515,7 @@ aside {
   flex: 3;
   font-size: 14px;
   gap: 20px;
-  font-family: 'PT Sans Narrow';
+  font-family: "PT Sans Narrow";
   display: none;
   flex-direction: row;
   overflow: auto;
@@ -471,7 +551,7 @@ aside {
   font-size: 14px;
 }
 .queryNumLocations input {
-  border: 1px solid #DAD9D9;
+  border: 1px solid #dad9d9;
 }
 
 #numLocations {
@@ -506,10 +586,11 @@ aside {
   /* background-color: #abd1c6; */
   border-radius: 8px 8px 8px 8px;
 }
-#HiddenMapControls label, select {
+#HiddenMapControls label,
+select {
   font-size: "1";
   // font-family: sans-serif;
-  font-family: 'PT Sans Narrow';
+  font-family: "PT Sans Narrow";
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -520,7 +601,7 @@ aside {
 
 .graphsContent {
   flex: 1;
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
 }
 
 .galleryContainer {
@@ -534,7 +615,7 @@ aside {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  
+
   /* background-color: #B2B2B2; */
   border-radius: 8px 8px 8px 8px;
 }
@@ -547,14 +628,14 @@ aside {
   width: 10vh;
   padding: 5px;
   background-color: #ffffff;
-  border: 1px solid #DAD9D9;
+  border: 1px solid #dad9d9;
 }
 
 .galleryPovWorld {
   height: 16vh;
   width: 16vh;
   box-sizing: border-box;
-  margin: 5px
+  margin: 5px;
 }
 
 .webgl-pov {
@@ -616,7 +697,7 @@ aside {
   padding: 0.5em;
   position: relative;
   text-align: center;
-  height:100%;
+  height: 100%;
 }
 
 .tag-text {
@@ -624,7 +705,7 @@ aside {
   display: block;
   font-size: "1";
   // font-family: sans-serif;
-  font-family: 'PT Sans Narrow';
+  font-family: "PT Sans Narrow";
   // font-weight: bold;
   overflow: hidden;
   user-select: none;
@@ -638,14 +719,14 @@ aside {
   border-radius: 0px 4px 4px 0px;
 }
 
-.tag:last-of-type>.slider-thumb {
+.tag:last-of-type > .slider-thumb {
   display: none !important;
 }
 
 .slider-thumb {
   align-items: center;
   background-color: white;
-  opacity: 0.00;
+  opacity: 0;
   border-radius: 4em;
   bottom: 0;
   cursor: ew-resize;
@@ -675,33 +756,35 @@ aside {
   padding: 1.5rem;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgb(0 0 10 / 0.2);
-  
+
   counter-reset: total;
   counter-reset: checked;
-  
+
   > * + * {
     margin-top: 0.75rem;
   }
-  
-  .checkbox { counter-increment: total; }
-  
-  input[type="checkbox"]:checked { counter-increment: checked; }
-  
+
+  .checkbox {
+    counter-increment: total;
+  }
+
+  input[type="checkbox"]:checked {
+    counter-increment: checked;
+  }
+
   &__result {
     font-weight: bold;
     padding-top: 0.75rem;
     border-top: 1px solid rgba(71, 71, 71, 0.2);
-    
-    &:after { 
-      content: counter(checked) " / " counter(total); 
+
+    &:after {
+      content: counter(checked) " / " counter(total);
       padding-left: 1ch;
     }
   }
 }
 
-
 .checkbox {
-
   margin-right: 10px;
   $block: &;
 
@@ -730,7 +813,7 @@ aside {
     .tick {
       stroke-dasharray: 20px;
       stroke-dashoffset: 20px;
-      transition: stroke-dashoffset .2s ease-out;
+      transition: stroke-dashoffset 0.2s ease-out;
     }
   }
 

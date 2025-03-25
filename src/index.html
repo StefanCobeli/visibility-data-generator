@@ -1,240 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Masterama</title>
-    <link rel="stylesheet" href="./style.scss">
+    <script src="d3.v7.min.js"></script>
+    <link rel="stylesheet" href="./style.scss" />
+    <link rel="stylesheet" type="text/css" href="parallel.css" />
+    <link rel="stylesheet" type="text/css" href="scatter.css" />
     <style>
-        body {
-            margin: 0;
-        }
+      body {
+        margin: 0;
+      }
 
-        canvas {
-            display: block;
-        }
+      canvas {
+        display: block;
+      }
 
-        #histogram {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
+      #histogram {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
+    <!-- <script src="https://d3js.org/d3.v6.min.js"></script> -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
 
-<body>
-    <!-- 3d explorer -->
+  <body>
     <div class="mapControlsContainer">
-        <i class="fa fa-eye" style="font-size:24px;"></i>
-        <!-- <i class="fa fa-map fa-2xl"></i> -->
+      <i class="fa fa-eye" style="font-size: 24px"></i>
 
-        <div class="mapControlsButtons">
-            <button class="userButton mapButton" onclick="experience.birdsEye.setTopViewCamera()">
-                <i class="fa fa-arrow-down" style="font-size:18px;"></i>
-            </button>
-            <button class="userButton mapButton" onclick="experience.birdsEye.setBirdsEyeCamera()">
-                <i class="fa fa-arrow-right" style="font-size:18px;"></i>
-            </button>
-        </div>
+      <div class="mapControlsButtons">
+        <button
+          class="userButton mapButton"
+          onclick="experience.birdsEye.setTopViewCamera()"
+        >
+          <i class="fa fa-arrow-down" style="font-size: 18px"></i>
+        </button>
+        <button
+          class="userButton mapButton"
+          onclick="experience.birdsEye.setBirdsEyeCamera()"
+        >
+          <i class="fa fa-arrow-right" style="font-size: 18px"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- Aside from 3d exploration everything else -->
-    <div class="containerRow">
-        <div class="canvasColumn">
+    <div class="main-container">
+      <div class="left-panel">
+        <div class="left-top">
+          <div class="canvasColumn">
             <canvas class="webgl"></canvas>
+          </div>
+        </div>
+        <div class="left-bottom">
+          <div class="galleryContent"></div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="right-box box1">
+          <div id="container-pcp">
+            <div id="category-header">
+              <span class="category-tab selected" data-category="semantics"
+                >Semantics</span
+              >
+              <span class="category-tab" data-category="perception"
+                >Perception</span
+              >
+              <span class="category-tab" data-category="building"
+                >Building Material</span
+              >
+            </div>
+
+            <div id="axis-buttons-pcp"></div>
+
+            <div id="chart-pcp">
+              <canvas id="background-pcp"></canvas>
+              <canvas id="foreground-pcp"></canvas>
+              <canvas id="highlight-pcp"></canvas>
+              <svg id="overlay-svg-pcp"></svg>
+            </div>
+
+            <div id="controls-pcp-building" style="display: none">
+              <label for="viewTowards">View Towards:</label>
+              <select id="viewTowards">
+                <option value="building">Building</option>
+                <option value="water">Water</option>
+              </select>
+
+              <button
+                id="compute-facade"
+                class="userButton"
+                style="margin-left: 1em"
+              >
+                Compute Facade
+              </button>
+            </div>
+
+            <div id="controls-pcp">
+              <label for="myCheckbox01">#Locations:</label>
+              <input
+                type="number"
+                id="numLocations"
+                min="1"
+                value="5"
+                max="1000"
+              />
+
+              <label
+                for="plane-checkbox"
+                style="
+                  margin-left: 1em;
+                  display: inline-flex;
+                  align-items: center;
+                "
+              >
+                <input type="checkbox" id="plane-checkbox" />
+                <span style="margin-left: 0.3em">Plane</span>
+              </label>
+              <button
+                id="query-viewpoints-pcp"
+                class="userButton"
+                style="margin-left: 1em"
+                onclick="handleQueryViewpointsClick()"
+              >
+                Query Viewpoints
+              </button>
+            </div>
+          </div>
         </div>
 
-        <!-- Perception Tab -->
-        <div class="uiColumn">
-            <div class="defaultContainer">
-                <div class="userQueries">
-                    <div class="tabs">
-                        <button class="tabButton tabButton--active"
-                            onclick="experience.queryTabs.openQuery(event, 'scenario')">Semantics</button>
-                        <button class="tabButton tabButton--inactive"
-                            onclick="experience.queryTabs.openQuery(event, 'openess')">Perception</button>
-                        <button class="tabButton tabButton--inactive"
-                            onclick="experience.queryTabs.openQuery(event, 'building')">Building Materials</button>
-                    </div>
-                    <div class="queryContainer">
-                        <!-- Slider for Semantics -->
-                        <div class="querySliders">
-                            <div class="slider"></div>
-                        </div>
-                        <div class="queryOpenessSliders" hidden>
-                            <div class="queryOpenessSlidersCol">
-                                <label for="greenness">greenness</label>
-                                <form id="greenness-form" class="sliderRow">
-                                    <i class="fa fa-trash" style="font-size:18px;" onclick="experience.world.removeFromParameter('greenness')"></i>
-                                    <input name="greennessRange"
-                                        onchange="experience.world.getOpenessParameters(this.value, this.id)"
-                                        id="greenness" type="range" min="0" max="100" value="50"
-                                        oninput="this.form.greennessAmount.value=this.value">
-                                    <input type="number" name="greennessAmount" min="0" max="100" value="50"
-                                        oninput="this.form.greennessRange.value=this.value" />
-                                </form>
+        <div class="right-box box2">
+          <div class="wrapper-scatter">
+            <div class="container-scatter">
+              <div class="projection-toggle-scatter">
+                <button id="btn-pca" class="projection-btn active">PCA</button>
+                <button id="btn-umap" class="projection-btn">UMAP</button>
+              </div>
 
-                                <label for="openness">openness</label>
-                                <form id="openness-form" class="sliderRow">
-                                    <i class="fa fa-trash" style="font-size:18px;" onclick="experience.world.removeFromParameter('openness')"></i>
-                                    <input name="openessRange"
-                                        onchange="experience.world.getOpenessParameters(this.value, this.id)"
-                                        id="openness" type="range" min="0" max="100" value="50"
-                                        oninput="this.form.openessAmount.value=this.value">
-                                    <input type="number" name="openessAmount" min="0" max="100" value="50"
-                                        oninput="this.form.openessRange.value=this.value" />
-                                </form>
-
-                                <label for="imageability">imageability</label>
-                                <form id="imageability-form" class="sliderRow">
-                                    <i class="fa fa-trash" style="font-size:18px;" onclick="experience.world.removeFromParameter('imageability')"></i>
-                                    <input name="imageabilityRange"
-                                        onchange="experience.world.getOpenessParameters(this.value, this.id)"
-                                        id="imageability" type="range" min="0" max="100" value="50"
-                                        oninput="this.form.imageabilityAmount.value=this.value">
-                                    <input type="number" name="imageabilityAmount" min="0" max="100" value="50"
-                                        oninput="this.form.imageabilityRange.value=this.value" />
-                                </form>
-                            </div>
-                            <div class="queryOpenessSlidersCol">
-                                <label for="enclosure">enclosure</label>
-                                <form id="enclosure-form" class="sliderRow">
-                                    <i class="fa fa-trash" style="font-size:18px;" onclick="experience.world.removeFromParameter('enclosure')"></i>
-                                    <input name="enclosureRange"
-                                        onchange="experience.world.getOpenessParameters(this.value, this.id)"
-                                        id="enclosure" type="range" min="0" max="100" value="50"
-                                        oninput="this.form.enclosureAmount.value=this.value">
-                                    <input type="number" name="enclosureAmount" min="0" max="100" value="50"
-                                        oninput="this.form.enclosureRange.value=this.value" />
-                                </form>
-
-                                <label for="walkability">walkability</label>
-                                <form id="walkability-form" class="sliderRow">
-                                    <i class="fa fa-trash" style="font-size:18px;" onclick="experience.world.removeFromParameter('walkability')"></i>
-                                    <input name="walkabilityRange"
-                                        onchange="experience.world.getOpenessParameters(this.value, this.id)"
-                                        id="walkability" type="range" min="0" max="100" value="50"
-                                        oninput="this.form.walkabilityAmount.value=this.value">
-                                    <input type="number" name="walkabilityAmount" min="0" max="100" value="50"
-                                        oninput="this.form.walkabilityRange.value=this.value" />
-                                </form>
-
-                                <label for="serenity">serenity</label>
-                                <form id="serenity-form" class="sliderRow">
-                                    <i class="fa fa-trash" style="font-size:18px;" onclick="experience.world.removeFromParameter('serenity')"></i>
-                                    <input name="serenityRange"
-                                        onchange="experience.world.getOpenessParameters(this.value, this.id)"
-                                        id="serenity" type="range" min="0" max="100" value="50"
-                                        oninput="this.form.serenityAmount.value=this.value">
-                                    <input type="number" name="serenityAmount" min="0" max="100" value="50"
-                                        oninput="this.form.serenityRange.value=this.value" />
-                                </form>
-                            </div>
-                        </div>
-                        <div class="queryParams">
-                            <div class="queryNumLocations">
-                                <p style="font-family:PT Sans Narrow">#Locations: </p>
-                                <input type="number" value="5" id="numLocations" name="numLocations" min="1"
-                                    max="1000" />
-                            </div>
-                            <div class="queryButtons">
-                                <label for="myCheckbox01" class="checkbox">
-                                    <input class="checkbox__input" type="checkbox" id="plane-checkbox"
-                                        onchange="experience.birdsEye.togglePlane()">
-                                    <svg class="checkbox__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22">
-                                        <rect stroke-width="1.5" width="21" height="21" x=".5" y=".5" fill="#FFF"
-                                            stroke="#DAD9D9" rx="3" />
-                                        <path class="tick" stroke="#272343" fill="none" stroke-linecap="round"
-                                            stroke-width="1" d="M4 10l5 5 9-9" />
-                                    </svg>
-                                    <span class="checkbox__label" style="font-family:PT Sans Narrow">Plane</span>
-                                </label>
-
-                                <button class="userButton" type="button"
-                                    onclick="experience.world.callQueryViewPoints()">Query Viewpoints</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              <div class="controls-scatter">
+                <label for="zoomToggle-scatter">
+                  <input type="checkbox" id="zoomToggle-scatter" checked />
+                  Zoom
+                </label>
+              </div>
             </div>
-
-            <!-- Scatter plot -->
-            <div class="defaultContainer graphsContainer">
-                <!-- <div class="graphsContent">
-                    This is the graph content.
-                </div> -->
-                <div id="HiddenMapControls">
-                    <label for="projection-selector">Projection:</label>
-                    <select id="projection-selector"></select>
-
-                    <label for="HiddenMapControls" class="checkbox" style="margin-top: 20px;">
-                        <span class="checkbox__label" style="font-family:PT Sans Narrow">Hide Query</span>
-                        <input class="checkbox__input" type="checkbox" id="hide-query"
-                            onchange="experience.hiddenMap.toggleHideQuery()">
-                        <svg class="checkbox__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22">
-                            <rect stroke-width="1.5" width="21" height="21" x=".5" y=".5" fill="#FFF" stroke="#DAD9D9"
-                                rx="3" />
-                            <path class="tick" stroke="#272343" fill="none" stroke-linecap="round" stroke-width="1"
-                                d="M4 10l5 5 9-9" />
-                        </svg>
-                    </label>
-
-                    <label for="HiddenMapControls-global" class="checkbox" style="margin-top: 20px;">
-                        <span class="checkbox__label" style="font-family:PT Sans Narrow">Hide Global</span>
-                        <input class="checkbox__input" type="checkbox" id="hide-global"
-                            onchange="experience.hiddenMap.toggleHideGlobal()">
-                        <svg class="checkbox__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22">
-                            <rect stroke-width="1.5" width="21" height="21" x=".5" y=".5" fill="#FFF" stroke="#DAD9D9"
-                                rx="3" />
-                            <path class="tick" stroke="#272343" fill="none" stroke-linecap="round" stroke-width="1"
-                                d="M4 10l5 5 9-9" />
-                        </svg>
-                    </label>
-                </div>
-                <div id="HiddenMap">
-                </div>
+            <div class="svg-scatter-wrapper">
+              <svg id="svg-scatter"></svg>
             </div>
-
-            <!-- Gallery -->
-            <div class="defaultContainer galleryContainer">
-                <div class="galleryContent">
-                </div>
-            </div>
-
+          </div>
         </div>
+      </div>
 
+      <!-- Scatter -->
 
+      <!-- Gallery -->
     </div>
 
-    <div class="graphsContainer" style="display: none;">
-        <div class="residualsContainer">
-            <span>Residuals</span>
-            <svg class="residualsGraph"></svg>
-        </div>
-        <div class="parallelCoordinatesContainer">
-            <span>Parralel Query Coordinates</span>
-            <div class="parallelCoordinates"></div>
-        </div>
+    <div class="graphsContainer" style="display: none">
+      <div class="residualsContainer">
+        <span>Residuals</span>
+        <svg class="residualsGraph"></svg>
+      </div>
+      <div class="parallelCoordinatesContainer">
+        <span>Parralel Query Coordinates</span>
+        <div class="parallelCoordinates"></div>
+      </div>
     </div>
 
     <div class="loading-bar"></div>
-    <script>
-        if (typeof window !== "undefined") { window.d3 = d3 }
-    </script>
-    <script type="module" src="./script.js"></script>
+    <!-- <script>
+      if (typeof window !== "undefined") {
+        window.d3 = d3;
+      }
+    </script> -->
+    <!-- <script type="module" src="./script.js"></script> -->
 
     <!-- Multithumb Slider Script -->
-    <script>
-
-    </script>
-    <script>
-
-    </script>
-</body>
-
-
+    <script></script>
+    <script></script>
+  </body>
+  <script src="https://d3js.org/d3.v2.js"></script>
+  <script src="parallel.js"></script>
+  <script src="scatter.js"></script>
 </html>
