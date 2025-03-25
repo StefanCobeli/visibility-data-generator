@@ -145,6 +145,7 @@ export default class World {
                 this.updatePovInterface(res);
                 this.experience.queryLocationParticles = this.particleHelper.plotParticles(res.data)
                 //Update Latent Features 2D map:
+                console.log("Updating query on 2d scatter plot.")
                 this.hiddenMap.renderQueryOnHiddenMap(res.data)
             })
             .catch(err => {

@@ -130,6 +130,12 @@
                             </div>
                         </div>
                         <div class="queryParams">
+
+                            <div class="dataExplorationModeCheckBox">
+                                <p style="font-family:PT Sans Narrow">Data Exploration</p>
+                                <input type="checkbox" id="dataExplorationModeCheckBox" name="dataExplorationModeCheckBox" 
+                                onchange="experience.hiddenMap.toggleDataExploration()"/>
+                            </div>
                             <div class="queryNumLocations">
                                 <p style="font-family:PT Sans Narrow">#Locations: </p>
                                 <input type="number" value="5" id="numLocations" name="numLocations" min="1"

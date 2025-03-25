@@ -34,16 +34,25 @@ export default class ParticleHelper extends EventEmitter {
         this.points;
         this.pointsWithDirection;
         this.arrowHelpersGroup;
-        this.material = new THREE.PointsMaterial({
-            size: 10,
-            color: 'green',
-            sizeAttenuation: false,
-        })
-        this.queryMaterial = new THREE.PointsMaterial({
-            size: 10,
+        // this.material = new THREE.PointsMaterial({
+        //     size: 10,
+        //     color: 'green',
+        //     sizeAttenuation: false,
+        // })
+
+        // this.queryMaterial = new THREE.PointsMaterial({
+        //     size: 10,
+        //     color: 'orange',
+        //     sizeAttenuation: false,
+        // })
+        this.queryMaterial = new THREE.MeshBasicMaterial({
             color: 'orange',
-            sizeAttenuation: false,
         })
+        this.material = new THREE.MeshBasicMaterial({
+            color: '#6F31EC',
+        })
+
+        
         this.selectedMaterial = new THREE.PointsMaterial({
             size: 10,
             color: new THREE.Color('#ffff00'),
@@ -81,11 +90,6 @@ export default class ParticleHelper extends EventEmitter {
         this.plotParticlesForVisibilityEnconderResult(this.lastResult)
     }
     plotParticlesForVisibilityEnconderResult(result) {
-        // material
-        const material = new THREE.PointsMaterial({
-            size: 3,
-        })
-        material.vertexColors = true
 
         this.lastResult = result;
         this.trigger("updatedQueryResult");
@@ -164,6 +168,13 @@ export default class ParticleHelper extends EventEmitter {
             )
         })
 
+
+        
+        // material
+        const material = new THREE.PointsMaterial({
+            size: 3,
+        })
+        material.vertexColors = true
 
         // points
         this.points = new THREE.Points(this.lookAtResults[this.currentLookAt].geometry, material)
@@ -278,21 +289,41 @@ export default class ParticleHelper extends EventEmitter {
                 THREE.MathUtils.degToRad(particle.zh),
             ]
 
-            const pointGeometry = new THREE.BufferGeometry()
-            const pointPosition = new Float32Array(position)
-            pointGeometry.setAttribute(
-                'position',
-                new THREE.BufferAttribute(pointPosition, 3)
-            )
-
-            let point;
+            // const pointGeometry = new THREE.BufferGeometry()
+            // const pointPosition = new Float32Array(position)
+            // pointGeometry.setAttribute(
+            //     'position',
+            //     new THREE.BufferAttribute(pointPosition, 3)
+            // ) 
+            // let point;
+            // if(particle.origin == 'query') {
+                //     point = new THREE.Points(pointGeometry, this.queryMaterial)
+            // }         
+            // else if(particle.origin == 'global') {
+            //     point = new THREE.Points(pointGeometry, this.material)
+            // }else {
+            //     point = new THREE.Points(pointGeometry, this.material)
+            // }
             
-            if(particle.origin == 'query') {
-                point = new THREE.Points(pointGeometry, this.queryMaterial)
-            } else if(particle.origin == 'global') {
-                point = new THREE.Points(pointGeometry, this.material)
+            let point;
+               
+            //const spheres = new THREE.Group()  // Group to hold all spheres
+            // let sphereGeometry = new THREE.SphereGeometry(5, 100, 100) // Radius 5, 16 segments  //Rounder spheres, harder to render 
+            let sphereGeometry = new THREE.SphereGeometry(10, 5, 5) // Radius 5, 16 segments  
+            
+            if (particle.origin == 'query') {
+                let sphere = new THREE.Mesh(sphereGeometry, this.queryMaterial)
+                sphere.position.set(position[0], position[1], position[2]) // Set position         
+                point = sphere//this.scene.add(spheres) // Add spheres to the scene
+            }   
+            else if(particle.origin == 'global') {
+                let sphere = new THREE.Mesh(sphereGeometry, this.material)
+                sphere.position.set(position[0], position[1], position[2]) // Set position         
+                point = sphere
             }else {
-                point = new THREE.Points(pointGeometry, this.material)
+                let sphere = new THREE.Mesh(sphereGeometry, this.material)
+                sphere.position.set(position[0], position[1], position[2]) // Set position         
+                point = sphere
             }
 
             points.push(point)

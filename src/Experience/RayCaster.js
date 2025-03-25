@@ -528,12 +528,12 @@ export default class RayCaster {
         this.guiFacadeControls = {
             sliderValue: 0,
             semanticName:"",
-            textValue: "",
+            textValue: "water",
             tileMeshes: [],
             facadeTiles: null,
             addTilesToScene : function addTilesToScene(tilesData) {
                 this.facadeTiles = tilesData
-                this.removeTilesFromScene()
+                // this.removeTilesFromScene()
                 tilesData.forEach(tile => {
                     // console.log({tile})
                     const { center, dimension, colors, points} = tile;
