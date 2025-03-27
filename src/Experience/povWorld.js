@@ -143,7 +143,7 @@ export default class PovWorld {
         this.scene.add(this.camera)
     }
     updateTooltip() {
-        console.log(this.locations[this.index]['f_xyz'])
+        // console.log(this.locations[this.index]['f_xyz'])
         // uncomment to use text tooltip
         this.createTextTooltip(this.index, this.locations[this.index]['f_xyz'])
 
@@ -158,7 +158,7 @@ export default class PovWorld {
         const chartElement = document.querySelector(`#chart${id}`)
         chartElement.innerHTML = ''
         for(const key in data) {
-            console.log(key, data[key]);
+            // console.log(key, data[key]);
             const p = document.createElement('p')
             p.textContent = `${key}: ${(data[key] * 100).toFixed(2)}%`
             p.style.borderRadius = "15px"; 
@@ -167,14 +167,14 @@ export default class PovWorld {
     }
     updateViewPort(result) {
         this.locations = result
-        console.log(this.locations);
+        // console.log(this.locations);
         this.updateCamera(this.index)
         this.updateTooltip()
     }
     updateCamera(index) {
         // update position
         const location = this.locations[index]
-        console.log({location})
+        // console.log({location})
         this.camera.position.set(
             location.x,
             location.y,

@@ -29,5 +29,10 @@ export default class GUI {
             .close()
         this.birdsEyeFolder = this.instance.addFolder('BirdsEye')
             .close()
+        this.sampleControls = this.instance.addFolder('SampleControls')
+                .close()
+            
+        
+        this.facadesFolder = this.instance.addFolder('Facades')
     }
 }

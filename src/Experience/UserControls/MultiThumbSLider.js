@@ -41,7 +41,7 @@ export default class MultiThumbSlider {
     }
 
     onSliderSelect(event, sliderThumb) {
-        console.log(this.tags);
+        // console.log(this.tags);
         document.body.style.cursor = 'ew-resize';
 
         let tagIndex = parseInt(sliderThumb.parentNode.getAttribute('data-tag-index'));
@@ -93,12 +93,13 @@ export default class MultiThumbSlider {
 
             this.emitEvent();
         };
+        //Kazi passing query parameters to backed
         let onEventUp = (event) => {
             event.preventDefault();
             document.body.style.cursor = 'initial';
             // Send new query values to World
             experience.world.setQueryParameters(this.tags);
-            console.log(this.tags);
+            // console.log(this.tags);
             removeEventListener();
         };
 

@@ -40,9 +40,11 @@ const possibleCoordName = {
 
 export default class HiddenMap {
     constructor() {
+        this.queryDataBackup 
         this.experience = new Experience();
         this.particleHelper = new ParticleHelper();
         this.svg = undefined;
+        this.dataExplorationUseCase = false;
 
 
         console.log("Possible projections are:", possibleCoordName)
@@ -77,10 +79,6 @@ export default class HiddenMap {
             .attr("height", "95%")
             .append("g");
 
-        this.hideQuery = false
-        this.hideGlobal = false
-
-
     };
 
 
@@ -106,6 +104,7 @@ export default class HiddenMap {
             global_locations = data;
             selected_locations = global_locations;
 
+            //Kazi 3D
             this.displayGlobalLocations();
 
             console.log("Populating hidden map with ", global_locations.length, " locations.")
@@ -160,22 +159,23 @@ export default class HiddenMap {
 
             // Function for custom scatter plot marker shape
 
-
-            // Load query.json for scatter plot
-            d3.json("small_query.json").then(queryData => {
-                this.renderQueryOnHiddenMap(queryData);
-                // this.queryPoints = queryData.map(d => d[coordName]);
-                // global_query_locations = queryData;
-                // // Use a custom shape for scatter plot points (e.g., square)
-                // svg.selectAll(".scatter-point")
-                //     .data(this.queryPoints)
-                //     .enter()
-                //     .append("path")
-                //     .attr("class", "scatter-point")
-                //     .attr("d", d => this.customShape(xScale(d[0]), yScale(d[1])))
-                //     .style("fill", colorQuery)
-                //     .style("opacity", 0.9);
-            });
+            if (!this.dataExplorationUseCase){
+                // Load query.json for scatter plot
+                d3.json("small_query.json").then(queryData => {
+                    this.renderQueryOnHiddenMap(queryData);
+                    // this.queryPoints = queryData.map(d => d[coordName]);
+                    // global_query_locations = queryData;
+                    // // Use a custom shape for scatter plot points (e.g., square)
+                    // svg.selectAll(".scatter-point")
+                    //     .data(this.queryPoints)
+                    //     .enter()
+                    //     .append("path")
+                    //     .attr("class", "scatter-point")
+                    //     .attr("d", d => this.customShape(xScale(d[0]), yScale(d[1])))
+                    //     .style("fill", colorQuery)
+                    //     .style("opacity", 0.9);
+                });
+            }
         });
 
 
@@ -190,8 +190,8 @@ export default class HiddenMap {
 
         const svg = d3.select("#HiddenMap")
         const selection = event.selection;
-        console.log("Selection computed in brushed()", selection);
-
+        // console.log("Selection computed in brushed()", selection);
+// 
         if (!selection) {
             // Reset selection
             // selected_locations = [];
@@ -223,7 +223,7 @@ export default class HiddenMap {
         // .each(d => selected_locations.push(d));
 
         // console.log("Selected Heatmap Points:", selected_locations);
-        console.log(svg.selectAll(".scatter-point"))
+        // console.log(svg.selectAll(".scatter-point"))
         // Update selected points for scatter plot (query.json)
         svg.selectAll(".scatter-point")
             .style("fill", colorQuery)
@@ -253,6 +253,7 @@ export default class HiddenMap {
 
     renderQueryOnHiddenMap(queryData) {
 
+        this.queryDataBackup = queryData
 
         console.log({ queryData })
 
@@ -387,7 +388,6 @@ export default class HiddenMap {
 
             // Sample 100 indexes from globalParticlesToPlot
             //Snippet from stackoverflow: https://stackoverflow.com/a/52232922
-
             globalParticlesToPlot = globalParticlesToPlot
                                         .map(a => [a,Math.random()])
                                         .sort((a,b) => {return a[1] < b[1] ? -1 : 1;})
@@ -403,14 +403,18 @@ export default class HiddenMap {
                 particlesToPlot = particlesToPlot.concat(queryParticlesToPlot)
             }
 
+            //Kazi 3D:
             this.experience.queryLocationParticles = this.particleHelper.plotParticles(particlesToPlot)
-
-
-            // let povStyleLocations = {data: selected_locations}
-            let povStyleLocations = { data: selected_query_locations }
+            
+            let povStyleLocations
+            if (this.dataExplorationUseCase){
+                povStyleLocations = { data : selected_locations } //display selection from all locations
+            }
+            else{
+                povStyleLocations = { data : selected_query_locations }//display selection only query locations
+            }
             // let povStyleLocations = selected_query_locations
             console.log({ povStyleLocations })
-
             this.experience.world.updatePovInterfaceAfterBrushOnHistogram(povStyleLocations)
             // this.experience.world.updatePovInterfaceAfterBrushOnHistogram(selected_query_locations);
             console.log({ selected_locations }); // For debugging purposes
@@ -424,5 +428,19 @@ export default class HiddenMap {
     toggleHideGlobal() {
         this.hideGlobal = !this.hideGlobal
         console.log(this.hideGlobal);
+    }
+
+    toggleDataExploration(){
+        if(!this.dataExplorationUseCase){
+            this.dataExplorationUseCase = true
+            console.log("Checkbox is checked..");
+            this.createHiddenMap();   
+            this.displayGlobalLocations()
+        }
+        else{
+            this.dataExplorationUseCase = false
+            console.log("Checkbox is not checked..");
+            this.renderQueryOnHiddenMap(this.queryDataBackup)
+        }
     }
 }

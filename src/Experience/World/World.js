@@ -59,7 +59,7 @@ export default class World {
             const percentage = val['value'] / 100;
             this.queryParameters[name] = percentage;
         })
-        console.log(this.queryParameters);
+        // console.log(this.queryParameters);
     }
     initializeOpenessParameters() {
         const slidersRows = document.getElementsByClassName('sliderRow')
@@ -102,6 +102,7 @@ export default class World {
         }
     }
     callQueryLocation() {
+        this.queryLocationParameters.numLocations.value = parseInt(document.querySelector('#numLocations').value)
         this.visibilityEncoderService.queryLocation(
             this.queryLocationParameters.numLocations.value,
             1,
@@ -128,7 +129,7 @@ export default class World {
         let goals = this.queryParameters
         if (this.isPerception) {
             const opennessPayload = {}
-
+            //Kazi passing query parameters to backed
             for (const key in this.queryParameters) {
                 const expression = predefinedFormulaLibrary[key]["expression"]
                 const value = this.queryParameters[key]
@@ -151,6 +152,7 @@ export default class World {
                 this.updatePovInterface(res);
                 this.experience.queryLocationParticles = this.particleHelper.plotParticles(res.data)
                 //Update Latent Features 2D map:
+                console.log("Updating query on 2d scatter plot.")
                 this.hiddenMap.renderQueryOnHiddenMap(res.data)
             })
             .catch(err => {

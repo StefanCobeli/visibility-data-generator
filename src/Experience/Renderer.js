@@ -90,15 +90,25 @@ export default class Renderer {
         } ).onChange( function ( value ) {
             this.saoPass.params.output = value
         } )
-        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBias', - 1, 1 )
-        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoIntensity', 0, 1 )
-        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoScale', 0, 100 )
-        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoKernelRadius', 1, 30 )
-        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoMinResolution', 0, 1 )
+        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBias', - 1, 0.2 )
+        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoIntensity', 0, 0.2 )
+        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoScale', 0, 10 )
+        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoKernelRadius', 1, 5 )
+        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoMinResolution', 0, 0.2 )
         this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlur' )
-        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurRadius', 0, 200 )
-        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurStdDev', 0.5, 150 )
-        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1 )
+        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurRadius', 0, 10 )
+        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurStdDev', 0.5, 5 )
+        this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.001 )
+
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBias', - 1, 1 )
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoIntensity', 0, 1 )
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoScale', 0, 100 )
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoKernelRadius', 1, 30 )
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoMinResolution', 0, 1 )
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlur' )
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurRadius', 0, 200 )
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurStdDev', 0.5, 150 )
+        // this.gui.ambientOcclusionFolder.add( this.saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1 )
 
         this.gui.ambientOcclusionFolder.add( this.saoPass, 'enabled' ).listen()
     }
