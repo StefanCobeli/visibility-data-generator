@@ -28,13 +28,21 @@ const categoryOptions = {
   ],
 };
 
-const dataFiles = {
+// const dataFiles = {
+//   semantics: "test_set_as_query.json",
+//   building: "test_set_buildings_as_query.json",
+//   perception: "test_set_perception_as_query.json",
+// };
+window.dataFiles = {
   semantics: "test_set_as_query.json",
   building: "test_set_buildings_as_query.json",
   perception: "test_set_perception_as_query.json",
 };
 
-let currentCategory = "semantics";
+
+// let currentCategory = "semantics";
+window.currentCategory = "semantics";
+
 let statePerCategory = {
   perception: {
     activeAxes: new Set(),
@@ -224,7 +232,7 @@ function initialize_chart() {
 function renderButtons(category) {
   const container = document.getElementById("axis-buttons-pcp");
   container.innerHTML = ""; // Clear current buttons
-  activeAxes = new Set(); // Reset active axes
+  window.activeAxes = new Set(); // Reset active axes
 
   categoryOptions[category].forEach((axis) => {
     const btn = document.createElement("button");
@@ -398,7 +406,7 @@ function paths(selected, ctx, count) {
     return result;
   }
 
-  shuffled_data = shuffleArray(selected);
+  window.shuffled_data = shuffleArray(selected);
 
   ctx.clearRect(0, 0, w + 1, h + 1);
 
@@ -480,22 +488,6 @@ function paths(selected, ctx, count) {
 
     console.log("Constructed Query Object:", queryObject);
     return queryObject;
-
-
-    world.queryLocationParameters.numLocations.value = parseInt(document.querySelector('#numLocations').value)
-    worldClass.visibilityEncoderService.queryLocation(
-      this.queryLocationParameters.numLocations.value,
-      1,
-      this.queryParameters
-     )
-      .then(res => {
-          console.log(res);
-          this.updatePovInterface(res);
-          this.experience.queryLocationParticles = this.particleHelper.plotParticles(res.data)
-      })
-      .catch(err => {
-          console.error(err);
-      })
   }
 }
 

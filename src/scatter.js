@@ -46,6 +46,8 @@ function drawScatter() {
   updateProjection(scatterCurProjection, width, height);
 }
 
+window.drawScatter = drawScatter
+
 // Main function to create or update the scatter plot
 function updateProjection(projectionType, width, height) {
   d3v7.json(dataFiles[currentCategory]).then((rawData) => {

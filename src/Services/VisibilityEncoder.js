@@ -148,7 +148,7 @@ export default class VisibilityEncoder {
             - how to render a big model from the distance and try not to render that much detail
             - represent results on screen, when you click on the result, go there and having the possibility to move back to birds view
     */
-    queryLocation(numLocations, seed, goals) {
+    queryLocation(numLocations, seed, goals, intervals=null) {
         const params = {
         }
         const data = [{
@@ -172,7 +172,7 @@ export default class VisibilityEncoder {
         )
     }
 
-    queryLocationOnPlane({numLocations, seed, goals, pointOnPlane, direction1, direction2, radius}) {
+    queryLocationOnPlane({numLocations, seed, goals, pointOnPlane, direction1, direction2, radius, intervals=null}) {
         const params = {
         }
         const data = [{

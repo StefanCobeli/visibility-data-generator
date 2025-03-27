@@ -19,6 +19,7 @@ export default class RayCaster {
         this.particleHelper = new ParticleHelper()
 
         // this.setTransformControl()
+        this.facadeTileMeshes = []
 
         this.sizes = this.experience.sizes
         this.buildingMeshes = this.experience.buildingMeshes
@@ -487,7 +488,12 @@ export default class RayCaster {
             // console.log(`Side: [${p1.x}, ${p1.y}, ${p1.z}] - [${p2.x}, ${p2.y}, ${p2.z}]`, "Perpendicular orientation:", rotX, rotY, rotZ);
         }
 
-        
+        //Check get value from facade dropdown 
+        // onclick - exp.raycaster.callGetFacadesForClickedBuildingAsContinousTiles
+        const viewSelect = document.getElementById("viewTowards");
+        const selectedValue = viewSelect.value;
+        console.log("The current facade thematic is: ", selectedValue);
+        this.guiFacadeControls.textValue = selectedValue
 
         this.visibilityEncoderService.predictFacadeFromBasePointsAsContinousTiles(basePoint, this.clickedBuildingHeight)
             .then(res => {
@@ -497,11 +503,48 @@ export default class RayCaster {
                 // this.particleHelper.plotParticlesForVisibilityEnconderResult(res.data)
                 this.guiFacadeControls.addTilesToScene(res.data);
                 console.log("Semantic ID: ", this.guiFacadeControls.sliderValue, " representing ", this.guiFacadeControls.semanticName)
-                
+                //update pcp data.
+
+                //when selecting pcp data make sure you call add tiles or update tiles.
             })
             .catch(err => {
                 console.log('Error: ', err.message)
             })
+    }
+
+    removeTilesFromScene() {// Function to remove all tiles from the scene
+        console.log(`Removing existing ${this.facadeTileMeshes.length} tiles from scene...`)
+        // this.facadeTileMeshes.forEach(mesh => {
+        this.guiFacadeControls.tileMeshes.forEach(mesh => {
+        this.experience.scene.remove(mesh);      // Remove from scene
+        mesh.geometry.dispose(); // Free memory
+        mesh.material.dispose(); // Free memory
+      });
+      this.guiFacadeControls.tileMeshes = []; // Clear the array
+    }
+
+    changeFacadeThematic () {
+        if(this.guiFacadeControls.facadeTiles == null){
+            const viewSelect = document.getElementById("viewTowards");
+            const selectedValue = viewSelect.value;
+            console.log("The current facade thematic is: ", selectedValue);
+            this.guiFacadeControls.textValue = selectedValue
+            // fetch('building_tiles_sample.json')
+            // // fetch('building_tiles_global.json')
+            // .then(response => response.json())
+            // .then(data => {
+            //     this.guiFacadeControls.addTilesToScene(data);
+            // })
+            // .catch(error => console.error('Error loading JSON:', error));              
+        }
+        else{
+            const viewSelect = document.getElementById("viewTowards");
+            const selectedValue = viewSelect.value;
+            console.log("The current facade thematic is: ", selectedValue);
+            this.guiFacadeControls.textValue = selectedValue
+            this.guiFacadeControls.addTilesToScene(this.guiFacadeControls.facadeTiles) 
+        }
+        console.log("Semantic ID: ", this.sliderValue, " representing ", this.semanticName)
     }
 
     setGUI() {
@@ -529,7 +572,7 @@ export default class RayCaster {
             sliderValue: 0,
             semanticName:"",
             textValue: "water",
-            tileMeshes: [],
+            tileMeshes: this.facadeTileMeshes,
             facadeTiles: null,
             addTilesToScene : function addTilesToScene(tilesData) {
                 this.facadeTiles = tilesData
@@ -584,31 +627,9 @@ export default class RayCaster {
                     this.tileMeshes.push(tileMesh);
                 });
             },
-            removeTilesFromScene : function removeTilesFromScene() {// Function to remove all tiles from the scene
-                console.log(`Removing existing ${this.tileMeshes.length} tiles from scene...`)
-                this.tileMeshes.forEach(mesh => {
-                this.scene.remove(mesh);      // Remove from scene
-                mesh.geometry.dispose(); // Free memory
-                mesh.material.dispose(); // Free memory
-              });
-              this.tileMeshes = []; // Clear the array
-            },
+            removeTilesFromScene : this.removeTilesFromScene,
             scene : this.experience.scene,
-            displayFacade: function () {
-                if(this.facadeTiles == null){
-                    fetch('building_tiles_sample.json')
-                    // fetch('building_tiles_global.json')
-                    .then(response => response.json())
-                    .then(data => {
-                        this.addTilesToScene(data);
-                    })
-                    .catch(error => console.error('Error loading JSON:', error));              
-                }
-                else{
-                    this.addTilesToScene(this.facadeTiles) 
-                }
-                console.log("Semantic ID: ", this.sliderValue, " representing ", this.semanticName)
-            }
+            displayFacade: this.changeFacadeThematic
         };
         this.gui.facadesFolder.add(this.guiFacadeControls, 'sliderValue', 0, 7, 1) // Min: 0, Max: 100, Step: 1
             .name("Semantic ID")

@@ -89,15 +89,25 @@
 
             <div id="controls-pcp-building" style="display: none">
               <label for="viewTowards">View Towards:</label>
-              <select id="viewTowards">
+              <select id="viewTowards"
+              onchange="experience.raycaster.changeFacadeThematic()">
                 <option value="building">Building</option>
                 <option value="water">Water</option>
               </select>
+              <button
+                id="compute-facade"
+                class="userButton"
+                style="margin-left: 1em"
+                onclick="experience.raycaster.removeTilesFromScene()"
+              >
+                R
+              </button>
 
               <button
                 id="compute-facade"
                 class="userButton"
                 style="margin-left: 1em"
+                onclick="experience.raycaster.callGetFacadesForClickedBuildingAsContinousTiles()"
               >
                 Compute Facade
               </button>
@@ -121,7 +131,7 @@
                   align-items: center;
                 "
               >
-                <input type="checkbox" id="plane-checkbox" />
+                <input type="checkbox" id="plane-checkbox" onchange="experience.birdsEye.togglePlane()"/>
                 <span style="margin-left: 0.3em">Plane</span>
               </label>
               <button
@@ -181,7 +191,6 @@
         window.d3 = d3;
       }
     </script> -->
-    <script type="module" src="./script.js"></script>
     
     <!-- Multithumb Slider Script -->
     <script></script>
@@ -190,4 +199,7 @@
   <script src="https://d3js.org/d3.v2.js"></script>
   <script type="module" src="parallel.js"></script>
   <script type="module" src="scatter.js"></script>
+
+
+  <script type="module" src="./script.js"></script>
 </html>

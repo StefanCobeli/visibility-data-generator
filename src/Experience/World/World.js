@@ -93,7 +93,7 @@ export default class World {
     callQueryViewPoints() {
         myFunction(); // Works now!
         let kaziQuery = handleQueryViewpointsClick()
-        console.log(kaziQuery)
+        console.log({kaziQuery})
         var element = document.getElementById('plane-checkbox');
         if (element.checked == true) {
             this.callQueryLocationOnPlane()
@@ -103,10 +103,27 @@ export default class World {
     }
     callQueryLocation() {
         this.queryLocationParameters.numLocations.value = parseInt(document.querySelector('#numLocations').value)
+        
+        let pcpInput = handleQueryViewpointsClick()
+        let pcpGoals = pcpInput.f_xyz
+        console.log({pcpGoals})
+        console.log(this.queryParameters)
+        
+        Object.keys(this.queryParameters).forEach(key => {
+            if (! pcpGoals.hasOwnProperty(key)){
+                pcpGoals[key] = 0;
+            }
+             // Update the value
+        });
+        // this.visibilityEncoderService.queryLocation(
+        //     this.queryLocationParameters.numLocations.value,
+        //     1,
+        //     this.queryParameters
+        // )
         this.visibilityEncoderService.queryLocation(
             this.queryLocationParameters.numLocations.value,
             1,
-            this.queryParameters
+            pcpGoals
         )
             .then(res => {
                 console.log(res);
@@ -138,10 +155,24 @@ export default class World {
             }
             goals = opennessPayload
         }
+        // this.visibilityEncoderService.queryLocationOnPlane({
+        //     numLocations: parseInt(document.querySelector('#numLocations').value),
+        //     seed: 20,
+        //     goals: goals,
+        //     pointOnPlane: [...planeCenter],
+        //     direction1: planeDirections[0],
+        //     direction2: planeDirections[1],
+        //     radius: [planeWidth, planeHeight]
+        // })
+        let pcpInput = handleQueryViewpointsClick()
+        let pcpGoals = pcpInput.f_xyz
+        console.log({goals})
+        console.log({pcpGoals})
+
         this.visibilityEncoderService.queryLocationOnPlane({
             numLocations: parseInt(document.querySelector('#numLocations').value),
             seed: 20,
-            goals: goals,
+            goals: pcpGoals,
             pointOnPlane: [...planeCenter],
             direction1: planeDirections[0],
             direction2: planeDirections[1],
@@ -153,7 +184,7 @@ export default class World {
                 this.experience.queryLocationParticles = this.particleHelper.plotParticles(res.data)
                 //Update Latent Features 2D map:
                 console.log("Updating query on 2d scatter plot.")
-                this.hiddenMap.renderQueryOnHiddenMap(res.data)
+                // this.hiddenMap.renderQueryOnHiddenMap(res.data)
             })
             .catch(err => {
                 console.error(err);
