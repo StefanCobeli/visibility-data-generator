@@ -128,8 +128,9 @@
                 id="query-viewpoints-pcp"
                 class="userButton"
                 style="margin-left: 1em"
-                onclick="handleQueryViewpointsClick()"
-              >
+                onclick="experience.world.callQueryViewPoints()"
+                >
+                <!-- onclick="handleQueryViewpointsClick()" -->
                 Query Viewpoints
               </button>
             </div>
@@ -180,13 +181,13 @@
         window.d3 = d3;
       }
     </script> -->
-    <!-- <script type="module" src="./script.js"></script> -->
-
+    <script type="module" src="./script.js"></script>
+    
     <!-- Multithumb Slider Script -->
     <script></script>
     <script></script>
   </body>
   <script src="https://d3js.org/d3.v2.js"></script>
-  <script src="parallel.js"></script>
-  <script src="scatter.js"></script>
+  <script type="module" src="parallel.js"></script>
+  <script type="module" src="scatter.js"></script>
 </html>

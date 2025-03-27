@@ -2,6 +2,10 @@
 // Copyright (c) 2012, Kai Chang
 // Released under the BSD License: http://opensource.org/licenses/BSD-3-Clause
 
+// import World from "./Experience/World/World";
+// let worldClass = new World();
+
+console.log("running pcp...")
 const categoryOptions = {
   semantics: [
     "building",
@@ -412,7 +416,7 @@ function paths(selected, ctx, count) {
   d3.timer(animloop);
 }
 
-function handleQueryViewpointsClick() {
+ export function handleQueryViewpointsClick() {
   if (brushSelected.length !== pcp_data_length) {
     // console.log("Selected data: ", brushSelected);
 
@@ -476,8 +480,25 @@ function handleQueryViewpointsClick() {
 
     console.log("Constructed Query Object:", queryObject);
     return queryObject;
+
+
+    world.queryLocationParameters.numLocations.value = parseInt(document.querySelector('#numLocations').value)
+    worldClass.visibilityEncoderService.queryLocation(
+      this.queryLocationParameters.numLocations.value,
+      1,
+      this.queryParameters
+     )
+      .then(res => {
+          console.log(res);
+          this.updatePovInterface(res);
+          this.experience.queryLocationParticles = this.particleHelper.plotParticles(res.data)
+      })
+      .catch(err => {
+          console.error(err);
+      })
   }
 }
+
 
 // transition ticks for reordering, rescaling and inverting
 function update_ticks(d, extent) {
@@ -738,3 +759,10 @@ function add_axis(axisName) {
     .duration(500)
     .attr("transform", (d) => "translate(" + xscale(d) + ")");
 }
+
+// parallel.js
+export function myFunction() {
+  console.log("Hello from parallel.js!");
+}
+
+console.log("imported pcp!")

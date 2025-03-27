@@ -7,11 +7,15 @@ import { normalizeGoal } from '../Utils/helpers'
 import Histogram from '../D3Charts/Histogram/Histogram'
 import PovWorld from '../povWorld'
 import { MAX_POV_AMOUNT } from '../Utils/constants'
-import HiddenMap from '../D3Charts/HiddenMap/HiddenMap'
+// import HiddenMap from '../D3Charts/HiddenMap/HiddenMap'
 import { predefinedFormulaLibrary } from '../D3Charts/DefinePerceptionIndex/predefinedPerceptions'
+// import { handleQueryViewpointsClick } from "../../parallel"
+
+import { handleQueryViewpointsClick, myFunction} from '../../parallel'
 
 export default class World {
     constructor() {
+
         this.experience = new Experience()
         this.scene = this.experience.scene
         this.visibilityEncoderService = this.experience.visibilityEncoderService
@@ -19,7 +23,7 @@ export default class World {
         this.birdsEye = this.experience.birdsEye
 
         this.particleHelper = new ParticleHelper()
-        this.hiddenMap = new HiddenMap()
+        this.hiddenMap = null //new HiddenMap()
         // this.hiddenMap      = this.experience.hiddenMap;
 
         this.histogram = new Histogram()
@@ -87,6 +91,9 @@ export default class World {
         console.log(this.queryParameters);
     }
     callQueryViewPoints() {
+        myFunction(); // Works now!
+        let kaziQuery = handleQueryViewpointsClick()
+        console.log(kaziQuery)
         var element = document.getElementById('plane-checkbox');
         if (element.checked == true) {
             this.callQueryLocationOnPlane()

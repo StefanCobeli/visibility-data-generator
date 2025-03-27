@@ -20,14 +20,17 @@ import Histogram from './D3Charts/Histogram/Histogram.js'
 import QueryTabs from './UserControls/QueryTabs.js'
 import MultiThumbSlider from './UserControls/MultiThumbSLider.js'
 import PieChart from './D3Charts/PieChart/pieChart.js'
-import HiddenMap from './D3Charts/HiddenMap/HiddenMap.js'
+// import HiddenMap from './D3Charts/HiddenMap/HiddenMap.js'
 
 // import require from 'require';
+// import { myFunction } from '../parallel.js';
+
 
 let instance = null
 
 export default class Experience {
     constructor(canvas) {
+        // myFunction()
         // Singleton
         if (instance) {
             return instance
