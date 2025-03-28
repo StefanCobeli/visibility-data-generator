@@ -9,7 +9,7 @@ export const AMORTIZE_SPEED_Z = 2.0
 
 //After 15 getting the error: 
 //"There are too many active WebGL contexts on this page, the oldest context will be lost"
-export const MAX_POV_AMOUNT = 15 //15 seems to be the limit. 30 //12 //10//15
+export const MAX_POV_AMOUNT = 6 //15 //15 seems to be the limit. 30 //12 //10//15
 
 export const KeyCode = {
     ARROW_UP :'ArrowUp',

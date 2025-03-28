@@ -322,7 +322,7 @@ export default class RayCaster {
         console.log(this.helper)
         console.log(obb)
         console.log("Created Bonding boxes")
-        this.guiFacadeControls.facadeTiles = null
+        // this.guiFacadeControls.facadeTiles = null
 
         this.clickedBuildingHeight = obb.halfSizes.y * 2
         this.clickedBuildingCenter = obb.center
@@ -573,9 +573,16 @@ export default class RayCaster {
             semanticName:"",
             textValue: "water",
             tileMeshes: this.facadeTileMeshes,
-            facadeTiles: null,
+            facadeTiles: null, //new Array(), //null
             addTilesToScene : function addTilesToScene(tilesData) {
-                this.facadeTiles = tilesData
+                if (this.facadeTiles == null){
+                    this.facadeTiles = tilesData
+                }
+                else{
+                    // this.facadeTiles = this.facadeTiles.concat(tilesData)
+                    this.facadeTiles.push(...tilesData)
+                    console.log("Current Tiles are:", this.facadeTiles)
+                }
                 // this.removeTilesFromScene()
                 tilesData.forEach(tile => {
                     // console.log({tile})
