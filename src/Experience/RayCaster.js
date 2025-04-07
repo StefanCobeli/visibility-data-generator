@@ -4,7 +4,7 @@ import MaterialHelper from './Utils/MaterialHelper'
 import { createArrayOfPointsFromGroup, createOBBHelper, updateChildrenMaterial } from './Utils/helpers'
 import * as YUKA from 'yuka'
 import ParticleHelper from './Utils/ParticleHelper'
-
+import {handleQueryViewpointsClick} from '../parallel'
 
 
 export default class RayCaster {
@@ -20,6 +20,9 @@ export default class RayCaster {
 
         // this.setTransformControl()
         this.facadeTileMeshes = []
+        // this.facadeTileMeshesIntensityColoredBackup = [] //In case we change colors according to pcp, keep a backup
+        // ColoredWithPcpSelection -- No need to keep backup of the meshes they are regenarated evry time anyway.
+        //the tile data backup is kept in this.guiFacadeControls.facadeTilesIntensityColoredBackup
 
         this.sizes = this.experience.sizes
         this.buildingMeshes = this.experience.buildingMeshes
@@ -512,7 +515,8 @@ export default class RayCaster {
             })
     }
 
-    removeTilesFromScene() {// Function to remove all tiles from the scene
+    removeTilesFromScene() {// Function to remove all tiles from the scene: 
+        // remove all meshes and all json objects: i.e. clear both facadeTiles and tileMeshes
         console.log(`Removing existing ${this.facadeTileMeshes.length} tiles from scene...`)
         // this.facadeTileMeshes.forEach(mesh => {
         this.guiFacadeControls.tileMeshes.forEach(mesh => {
@@ -520,6 +524,7 @@ export default class RayCaster {
         mesh.geometry.dispose(); // Free memory
         mesh.material.dispose(); // Free memory
       });
+      this.guiFacadeControls.facadeTiles = null
       this.guiFacadeControls.tileMeshes = []; // Clear the array
     }
 
@@ -542,9 +547,78 @@ export default class RayCaster {
             const selectedValue = viewSelect.value;
             console.log("The current facade thematic is: ", selectedValue);
             this.guiFacadeControls.textValue = selectedValue
+            console.log("Resetting colors to intensity. Repress the checkbox to see query colors again.")
+            if (this.guiFacadeControls.facadeTilesIntensityColoredBackup!= null){
+                this.guiFacadeControls.facadeTiles = this.guiFacadeControls.facadeTilesIntensityColoredBackup
+                this.guiFacadeControls.facadeTilesIntensityColoredBackup = null
+            }
             this.guiFacadeControls.addTilesToScene(this.guiFacadeControls.facadeTiles) 
         }
         console.log("Semantic ID: ", this.sliderValue, " representing ", this.semanticName)
+    }
+
+    changeFacadeThematicFollowingPcpQuery(){
+        const buildingQueryCheckbox = document.getElementById('building-query-checkbox'); // Replace 'myCheckbox' with the actual ID of your checkbox
+
+        if (buildingQueryCheckbox.checked) {
+            // Checkbox is checked
+            console.log('Checkbox is checked');
+            let pcpQuery = handleQueryViewpointsClick()
+            console.log('The pcp query is: ', pcpQuery);
+            if (this.guiFacadeControls.facadeTiles == null || pcpQuery == null){
+                console.log("Either No facades are existing yet or no pcp Selection was made. Please generate some before highliging them: ", this.facadeTiles)
+                return 
+            }
+            else{
+                // Create new tile data with highlighted colors based on pcp query.
+                let pcpHighlightedFacadeTiles = [...this.guiFacadeControls.facadeTiles]//.forEach
+                console.log("Current Tiles are:", pcpHighlightedFacadeTiles)
+                //Steps:
+                //1. define colors for colorHighlighted and colorNotHighlighted:
+                let highlightedTileColor    = "#e85461"//"#fdd295" //handpicked from Seaborn magma color scale 
+                let notHighlightedTileColor = "#DCDCDC"//"#7e2481" //handpicked from Seaborn magma color scale 
+                //2. for each existing tile in tilesData 
+                for (let tileObjectID in pcpHighlightedFacadeTiles){
+                    //         highlightedTile = tile
+                    let tileObject = pcpHighlightedFacadeTiles[tileObjectID]
+
+                    // console.log("First tile Object:", {tileObjectID})
+                    // console.log("First tile Object:", {tileObject})
+                    // console.log("\t mean intensities:", tileObject["mean_intensities"])
+                    // console.log("\t colors:", tileObject["colors"])
+                    //      3. for each semantic in tile.mean_intensties 
+                    let tileShouldBeHighlighted = true
+                    for (let semanticId in pcpQuery["f_xyz"]){
+                        //              4. if tile.mean_intensties[semantic]  in pcpQuery.f_xyz +- pcpQuery.intervals
+                        let lowerT = pcpQuery["f_xyz"][semanticId] - pcpQuery["intervals"][semanticId]/2
+                        let upperT = pcpQuery["f_xyz"][semanticId] + pcpQuery["intervals"][semanticId]/2
+                        // console.log(semanticId, "Found interval constraints: ", lowerT, upperT )
+                        let tileSemIntensity = tileObject["mean_intensities"][semanticId]
+                        if(! ((tileSemIntensity >= lowerT) && (tileSemIntensity <= upperT))){
+                            tileShouldBeHighlighted = false
+                            break
+                        }
+                    }
+                    //                          4'.  highlightedTile["colors"]["semantic"] = colorHighlighted
+                    //                5.   else{ highlightedTile["colors"]["semantic"] = colorNotHighlighted}
+                    for (let semanticId  in pcpHighlightedFacadeTiles[tileObjectID]["colors"]){
+                        // pcpHighlightedFacadeTiles.push(highlightedTile) 
+                        // console.log(tileShouldBeHighlighted ? highlightedTileColor : notHighlightedTileColor)
+                        // console.log("Former color:", pcpHighlightedFacadeTiles[tileObjectID]["colors"][semanticId])
+                        pcpHighlightedFacadeTiles[tileObjectID]["colors"][semanticId] = tileShouldBeHighlighted ? highlightedTileColor : notHighlightedTileColor
+                        // console.log("Updated color:", pcpHighlightedFacadeTiles[tileObjectID]["colors"][semanticId])
+                    }
+                    // break
+                }
+                console.log("Updating the tile colors, using newly tiles:", pcpHighlightedFacadeTiles)
+                this.guiFacadeControls.addTilesToScene(pcpHighlightedFacadeTiles, true) //analysis mode = true - second argument
+            }
+
+            // update this.facadeTileMeshesIntensityColoredBackup
+        } else {
+            // Checkbox is not checked
+            console.log('Checkbox is not checked');
+        }
     }
 
     setGUI() {
@@ -572,14 +646,24 @@ export default class RayCaster {
             sliderValue: 0,
             semanticName:"",
             textValue: "water",
-            tileMeshes: this.facadeTileMeshes,
-            facadeTiles: null, //new Array(), //null
-            addTilesToScene : function addTilesToScene(tilesData) {
-                if (this.facadeTiles == null){
+            tileMeshes: this.facadeTileMeshes,//tileMeshes are the ThreeJS meshes
+            facadeTiles: null, //facadeTiles are the json Objects creating the meshes.
+            facadeTilesIntensityColoredBackup : null,
+            addTilesToScene : function addTilesToScene(tilesData, analysisMode=false) {
+                if (analysisMode){ 
+                    //Building building-query-checkbox is checked and 
+                    // artificially highlight colored tiles are generated
+                    //Save facadeTiles in facadeTilesIntensityColoredBackup
+                    this.facadeTilesIntensityColoredBackup = [...this.facadeTiles]
+                }
+
+                if (this.facadeTiles == null || analysisMode || this.facadeTiles===tilesData){
                     this.facadeTiles = tilesData
+                    console.log("Current Tiles are:", this.facadeTiles)
                 }
                 else{
                     // this.facadeTiles = this.facadeTiles.concat(tilesData)
+                    console.log("ReceivedTiles:", tilesData)
                     this.facadeTiles.push(...tilesData)
                     console.log("Current Tiles are:", this.facadeTiles)
                 }
@@ -632,6 +716,11 @@ export default class RayCaster {
                     // Add tile to the scene
                     this.scene.add(tileMesh);
                     this.tileMeshes.push(tileMesh);
+
+                    if (analysisMode){ //restore facadeTiles data after generating the highlights.
+                        this.facadeTiles = this.facadeTilesIntensityColoredBackup
+                    }
+
                 });
             },
             removeTilesFromScene : this.removeTilesFromScene,

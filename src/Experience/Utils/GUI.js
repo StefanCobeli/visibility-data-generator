@@ -6,8 +6,8 @@ export default class GUI {
         this.instance = new dat.GUI()
         this.debugObject = {}
 
-        if(!enableGUI) {
-        // if(true){
+        // if(!enableGUI) {
+        if(true){
             this.instance.hide()
         }
 

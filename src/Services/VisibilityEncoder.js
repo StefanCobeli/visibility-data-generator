@@ -182,7 +182,8 @@ export default class VisibilityEncoder {
             direction_2: direction2,
             r: radius,
             num_locations: numLocations,
-            seed: seed
+            seed: seed,
+            intervals: intervals
         }]
         console.log(data);
         return axios(

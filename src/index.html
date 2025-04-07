@@ -101,12 +101,12 @@
                 <option value="miscellaneous">Miscellaneous</option>
               </select>
               <button
-                id="compute-facade"
+                id="remove-facades"
                 class="userButton"
                 style="margin-left: 1em"
                 onclick="experience.raycaster.removeTilesFromScene()"
               >
-                R
+                R<i class="fa fa-refresh" style="font-size: 18px"></i>
               </button>
 
               <button
@@ -120,6 +120,19 @@
             </div>
 
             <div id="controls-pcp">
+              
+              <label
+                for="building-query-checkbox"
+                style="
+                  margin-left: 1em;
+                  display: inline-flex;
+                  align-items: center;
+                ">
+                <input type="checkbox" id="building-query-checkbox"
+                onclick="experience.raycaster.changeFacadeThematicFollowingPcpQuery()"/>
+                <span style="margin-left: 0.3em">Building View Query</span>
+              </label>
+
               <label for="myCheckbox01">#Locations:</label>
               <input
                 type="number"
@@ -138,6 +151,7 @@
                 "
               >
                 <input type="checkbox" id="plane-checkbox" onchange="experience.birdsEye.togglePlane()"/>
+
                 <span style="margin-left: 0.3em">Plane</span>
               </label>
               <button

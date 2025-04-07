@@ -309,7 +309,8 @@ export default class ParticleHelper extends EventEmitter {
                
             //const spheres = new THREE.Group()  // Group to hold all spheres
             // let sphereGeometry = new THREE.SphereGeometry(5, 100, 100) // Radius 5, 16 segments  //Rounder spheres, harder to render 
-            let sphereGeometry = new THREE.SphereGeometry(10, 5, 5) // Radius 5, 16 segments  
+            // let sphereGeometry = new THREE.SphereGeometry(10, 5, 5) // Radius 5, 16 segments  
+            let sphereGeometry = new THREE.SphereGeometry(5, 20, 20) // Radius 5, 16 segments  
             
             if (particle.origin == 'query') {
                 let sphere = new THREE.Mesh(sphereGeometry, this.queryMaterial)

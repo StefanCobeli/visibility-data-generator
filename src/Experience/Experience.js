@@ -512,6 +512,7 @@ export default class Experience {
         this.world.city.setMaterialByMode(VIEW_MODES['visibility'])
         this.world.lights.setDirectionalLight(false)
         this.renderer.updateClearColor(`rgb(${OBJECT_TO_COLOR['sky']})`)
+        // this.renderer.updateClearColor(`#ffffff`)
         this.renderer.saoPass.enabled = false
         
         const end = performance.now()
@@ -539,8 +540,10 @@ export default class Experience {
         this.currentMode = VIEW_MODES['realWorld']
         this.world.city.setMaterialByMode(VIEW_MODES['realWorld'])
         this.world.lights.setDirectionalLight(true)
-        this.renderer.updateClearColor(`${REAL_WORLD_OBJECT_TO_COLOR['sky']}`)
+        // this.renderer.updateClearColor(`${REAL_WORLD_OBJECT_TO_COLOR['sky']}`)
+        this.renderer.updateClearColor(`#ffffff`)
         this.renderer.saoPass.enabled = true
+        // this.renderer.saoPass.enabled = false
         const end = performance.now()
         console.log(`Execution time: ${end - start} ms`)
 

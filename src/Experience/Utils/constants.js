@@ -55,6 +55,7 @@ export const BUILDING_OBJECT_TO_COLOR = {
     'plaster': '255,255,255',
     'metal': '0,255,0',
     'miscelaneous':'0,0,0',
+    'sky':'#83A2EE',
 }
 export const BUILDING_COLOR_TO_OBJECT = {
     '255,0,0': 'brick',
