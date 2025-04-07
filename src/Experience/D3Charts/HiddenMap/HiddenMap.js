@@ -38,6 +38,9 @@ const possibleCoordName = {
 };
 
 
+const point_radius = 1 //Use to be 4
+
+
 export default class HiddenMap {
     constructor() {
         this.queryDataBackup 
@@ -132,7 +135,6 @@ export default class HiddenMap {
             // const yAxis = svg.append("g");
             // xAxis.call(d3.axisBottom(xScale));
             // yAxis.call(d3.axisLeft(yScale));
-
             // Create heatmap points
             svg.selectAll(".heat-point")
                 .data(heatData)
@@ -141,7 +143,7 @@ export default class HiddenMap {
                 .attr("class", "heat-point")
                 .attr("cx", d => xScale(d[0]))
                 .attr("cy", d => yScale(d[1]))
-                .attr("r", 4)
+                .attr("r", point_radius)
                 .style("fill", colorGlobal)
                 .style("opacity", 0.5);
 
@@ -240,9 +242,9 @@ export default class HiddenMap {
         // console.log("Selected Scatter Plot Points:", selected_query_locations);
     }
 
-    customShape(x, y) {
+    customShape(x, y, size=6) {
         // 'x' shape for scatter points
-        const size = 6;
+        // const size = 6;
         // return `M${x - size},${y - size} L${x + size},${y + size} M${x + size},${y - size} L${x - size},${y + size}`;
         return `M${x},${y - size} L${x - size},${y + size} L${x + size},${y + size} Z`; //triangle
         // return `M${x - size},${y - size} L${x + size},${y - size} L${x + size},${y + size} L${x - size},${y + size} Z`;
@@ -268,7 +270,7 @@ export default class HiddenMap {
             .enter()
             .append("path")
             .attr("class", "scatter-point")
-            .attr("d", d => this.customShape(xScale(d[0]), yScale(d[1])))
+            .attr("d", d => this.customShape(xScale(d[0]), yScale(d[1]), point_radius))
             .style("fill", colorQuery)
             .style("opacity", 0.9);
         global_query_locations = queryData;

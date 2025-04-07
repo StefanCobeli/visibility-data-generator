@@ -47,9 +47,13 @@ export default class ParticleHelper extends EventEmitter {
         // })
         this.queryMaterial = new THREE.MeshBasicMaterial({
             color: 'orange',
+            transparent: true, // Enable transparency
+            opacity: 0.95, // Adjust transparency (0 = fully transparent, 1 = fully opaque)
         })
         this.material = new THREE.MeshBasicMaterial({
             color: '#6F31EC',
+            transparent: true, // Enable transparency
+            opacity: 0.95, // Adjust transparency (0 = fully transparent, 1 = fully opaque)
         })
 
         
@@ -309,7 +313,9 @@ export default class ParticleHelper extends EventEmitter {
                
             //const spheres = new THREE.Group()  // Group to hold all spheres
             // let sphereGeometry = new THREE.SphereGeometry(5, 100, 100) // Radius 5, 16 segments  //Rounder spheres, harder to render 
-            let sphereGeometry = new THREE.SphereGeometry(10, 5, 5) // Radius 5, 16 segments  
+            // let sphereGeometry = new THREE.SphereGeometry(10, 5, 5) // Radius 5, 16 segments  
+            // let sphereGeometry = new THREE.SphereGeometry(5, 10, 10) // Radius 5, 16 segments  
+            let sphereGeometry = new THREE.SphereGeometry(10, 10, 10) // Radius 5, 16 segments  
             
             if (particle.origin == 'query') {
                 let sphere = new THREE.Mesh(sphereGeometry, this.queryMaterial)
@@ -394,6 +400,9 @@ export default class ParticleHelper extends EventEmitter {
             size: 10,
             color: 'red'
         })
+
+
+
 
         // points
         this.radiusPoints = new THREE.Points(geometry, material)

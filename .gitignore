@@ -5,3 +5,4 @@ node_modules
 src/Experience/World/models.js
 src/Experience/Utils/GUI.js
 static/data/
+static/*
