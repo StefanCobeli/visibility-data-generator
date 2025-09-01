@@ -20,6 +20,57 @@ export default class BirdsEye {
         this.setGUI()
     }
 
+    setCameraPositionLakeFacade() {
+        const cameraPosition = {x: 3083.4403115020214, y: 183.08829851055833, z: 1597.4163062514085}
+        // -7.437792976827618,  55.7431423000247,  -1.7641486363351758e-14
+        const cameraRotation = {
+            x: THREE.MathUtils.degToRad(-7.437792976827618), y: THREE.MathUtils.degToRad(55.7431423000247), z: THREE.MathUtils.degToRad(-1.7641486363351758e-14)
+        }
+        this.setCameraParameters(cameraPosition, cameraRotation)
+    }
+
+    setCameraPositionStreet(){
+        const cameraPosition = {x: 1834.6653186615072, y: 55.28989447079854, z: 1091.2480561173586}
+        // -6.291877386565971,  140.88467065646557,  -4.199775357469028e-14
+        const cameraRotation = {
+            x: THREE.MathUtils.degToRad(-6.291877386565971), y: THREE.MathUtils.degToRad(140.88467065646557), z: THREE.MathUtils.degToRad(-4.199775357469028e-14)
+        }
+        this.setCameraParameters(cameraPosition, cameraRotation)
+    }
+
+    setCameraPark(){
+        const cameraPosition = {x: 165.1595479209716, y: 119.2755234039048, z: 1597.8762839711906}
+        // -3.312496851885768,  -82.17841630726844,  -5.993432096049718e-14
+        const cameraRotation = {
+            x: THREE.MathUtils.degToRad(-3.312496851885768), y: THREE.MathUtils.degToRad(-82.17841630726844), z: THREE.MathUtils.degToRad(-5.993432096049718e-14)
+        }
+        this.setCameraParameters(cameraPosition, cameraRotation)
+    }
+
+    setCameraParameters(cameraPosition, cameraRotation){
+        const cameraFar = 7500
+        new JEASINGS.JEasing(this.camera.instance.position)
+            .to(
+                {
+                    ...cameraPosition
+                },
+                500
+            )
+            .easing(JEASINGS.Cubic.Out)
+            .start()
+            new JEASINGS.JEasing(this.camera.instance.rotation)
+                .to(
+                    {
+                        ...cameraRotation
+                    },
+                    500
+                )
+                .easing(JEASINGS.Cubic.Out)
+                .start()
+        this.camera.instance.far = cameraFar
+        this.camera.instance.updateProjectionMatrix()
+    }
+
     setBirdsEyeCamera() {
         const cameraPosition = {
             x: 1222.9460847744015,
@@ -113,6 +164,34 @@ export default class BirdsEye {
         } else {
             this.disposePlane()
         }
+    }
+    addStreetPlane(){
+        this.disposePlane()
+        this.setTransformControls()
+
+        const geometry = new THREE.PlaneGeometry(2000, 1000, 1, 1)
+        geometry.rotateX(Math.PI * 0.5)
+
+        const material = new THREE.MeshBasicMaterial({
+            color: 'teal',
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.DoubleSide,
+        })
+        this.plane = new THREE.Mesh(geometry, material)
+        this.plane.position.set(
+            1689.921323470862,
+            24.90033517884177,
+            832.5969455267501,
+        )        
+
+        this.plane.rotation.set(-0.004059820241478084
+            , -0.49919566973695967, -0.03061909652818535)
+  
+        this.plane.scale.set(0.5562019512335841, 1, 0.030994724123535735)
+        this.transformControls.attach(this.plane)
+
+        this.scene.add(this.plane)
     }
     addPlane() {
         this.setTransformControls()

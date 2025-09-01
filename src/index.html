@@ -59,7 +59,44 @@
           </div>
         </div>
         <div class="left-bottom">
-          <div class="galleryContent"></div>
+          <div class="galleryContent">
+
+            <div class="mapControlsButtons">
+              <button
+                class="userButton mapButton"
+                onclick="experience.birdsEye.setCameraPositionLakeFacade()"
+              >
+                <i class="fa fa-building" style="font-size: 18px"></i>
+              </button>
+              <button
+                class="userButton mapButton"
+                onclick="experience.birdsEye.setBirdsEyeCamera()"
+              >
+               <!-- <i class="fa fa-arrow-up fa-spin"></i> -->
+                <i class="fa fa-shower" style="font-size: 18px"></i>
+              </button>
+              <button
+                class="userButton mapButton"
+                onclick="experience.birdsEye.setCameraPositionStreet()"
+              >
+                <!-- <i class="fa fa-arrow-up fa-pulse" style="font-size: 18px"></i> -->
+                <i class="fa fa-" style="font-size: 18px"></i>
+              </button>
+              <button
+                class="userButton mapButton"
+                onclick="experience.birdsEye.setCameraPark()"
+              >
+                <i class="fa fa-tree" style="font-size: 18px"></i>
+              </button>
+
+              <button
+              class="userButton mapButton"
+              onclick="experience.birdsEye.addStreetPlane()"
+            >
+              <i class="fa fa-road" style="font-size: 18px"></i>
+            </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -86,8 +123,27 @@
               <canvas id="highlight-pcp"></canvas>
               <svg id="overlay-svg-pcp"></svg>
             </div>
-
             <div id="controls-pcp-building" style="display: none">
+
+              <select id="controlsSelection-dropdown-2">
+                <option value="facade">Facade</option>
+                <option value="query">Query</option>
+              </select>
+
+              <!-- <input type="checkbox" id="toogle-building-to-semantics-checkbox"> -->
+
+
+              <label
+                for="building-query-checkbox"
+                style="
+                  margin-left: 1em;
+                  display: inline-flex;
+                  align-items: center;
+                ">
+                <input type="checkbox" id="building-query-checkbox"
+                onclick="experience.raycaster.changeFacadeThematicFollowingPcpQuery()"/>
+                <span style="margin-left: 0.3em">Building View Query</span>
+              </label>
               <label for="viewTowards">View Towards:</label>
               <select id="viewTowards"
               onchange="experience.raycaster.changeFacadeThematic()">
@@ -120,19 +176,12 @@
             </div>
 
             <div id="controls-pcp">
-              
-              <label
-                for="building-query-checkbox"
-                style="
-                  margin-left: 1em;
-                  display: inline-flex;
-                  align-items: center;
-                ">
-                <input type="checkbox" id="building-query-checkbox"
-                onclick="experience.raycaster.changeFacadeThematicFollowingPcpQuery()"/>
-                <span style="margin-left: 0.3em">Building View Query</span>
-              </label>
 
+              <!-- <input type="checkbox" id="toogle-semantics-to-building-checkbox"> -->
+              <select id="controlsSelection-dropdown-1">
+                <option value="facade">Facade</option>
+                <option value="query" selected>Query</option>
+              </select>
               <label for="myCheckbox01">#Locations:</label>
               <input
                 type="number"

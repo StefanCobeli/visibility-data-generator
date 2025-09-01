@@ -96,6 +96,7 @@ window.onload = function () {
   setChartSize();
   toggleControls(currentCategory); //
   loadCategoryData(currentCategory);
+  checkboxEventListenet();
 };
 
 function setupHeaderEvents() {
@@ -113,6 +114,59 @@ function setupHeaderEvents() {
     });
   });
 }
+
+function checkboxEventListenet(){
+  /*
+      const controlsQueryCheckbox1 = document.getElementById('toogle-semantics-to-building-checkbox');
+      const controlsQueryCheckbox2 = document.getElementById('toogle-building-to-semantics-checkbox');
+      controlsQueryCheckbox1.addEventListener("click", 
+          async (e) => {
+          console.log("first Radio box was clicked.")
+          console.log("Unchecked.")
+          document.getElementById("controls-pcp").style.display = "none";
+          document.getElementById("controls-pcp-building").style.display = "flex";
+          controlsQueryCheckbox1.checked = false
+        } 
+      )
+      controlsQueryCheckbox2.addEventListener("click", 
+        async (e) => {
+        console.log("second Radio box was clicked.")
+
+        console.log("Checked.")
+        document.getElementById("controls-pcp").style.display = "flex" ;
+        document.getElementById("controls-pcp-building").style.display = "none";
+
+        controlsQueryCheckbox2.checked = false
+      } 
+    )
+      */
+    ////////////////////////////////////////
+    const controlsQueryDropDown1 = document.getElementById('controlsSelection-dropdown-1');
+    const controlsQueryDropDown2 = document.getElementById('controlsSelection-dropdown-2');
+    controlsQueryDropDown1.addEventListener("change", 
+        async (e) => {
+        console.log("first dropdown box was changed.")
+        console.log("facade.")
+        document.getElementById("controls-pcp").style.display = "none";
+        document.getElementById("controls-pcp-building").style.display = "flex";
+        controlsQueryDropDown1.value = "query"
+        controlsQueryDropDown2.value = "facade"
+      } 
+    )
+    controlsQueryDropDown2.addEventListener("change", 
+      async (e) => {
+      console.log("second dropdown box was changed.")
+
+      console.log("query.")
+      document.getElementById("controls-pcp").style.display = "flex" ;
+      document.getElementById("controls-pcp-building").style.display = "none";
+      controlsQueryDropDown1.value = "query"
+      controlsQueryDropDown2.value = "facade"
+    } 
+    )
+  
+}
+
 
 function toggleControls(category) {
   document.getElementById("controls-pcp").style.display =

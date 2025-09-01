@@ -26,13 +26,19 @@ export default class Camera {
       1,
       2500
     );
-    this.instance.position.set(512, 100, 280);
+    //1. random point on the lake
+    this.instance.position.set(512, 100, 280); this.instance.lookAt(733, 55, 714);   this.instance.quaternion.set(0, 0.2, 0, 1); // 1. random point on the lake
     // this.instance.position.set(0, 100, 0)
-    this.instance.lookAt(733, 55, 714); // random point on the lake
+  
+    // // 2. random point on the second lake & // 2. building on the second lake
+    // this.instance.position.set(3083, 183, 1597); this.instance.lookAt(733, 55, 714); this.instance.position.set(0, 100, 0)// this.instance.lookAt(2266, 58, 1091); 
+    // this.instance.quaternion.set(0.8821362464493141, -0.057337348785240105, 0.4665068471910652,  0.030322147985371972);
 
-    // this.instance.position.set(337.87109375, -11.231389999389648,  -59.07550048828125)
+   // this.instance.position.set(337.87109375, -11.231389999389648,  -59.07550048828125)
 
-    this.instance.quaternion.set(0, 0.2, 0, 1);
+  
+ 
+    
     this.instance.quaternion.set(...CAMERA_QUATERNIONS[this.quaternionIndex]);
     this.scene.add(this.instance);
   }

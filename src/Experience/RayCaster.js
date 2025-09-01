@@ -527,7 +527,7 @@ export default class RayCaster {
       this.guiFacadeControls.facadeTiles = null
       this.guiFacadeControls.tileMeshes = []; // Clear the array
     }
-
+      
     changeFacadeThematic () {
         if(this.guiFacadeControls.facadeTiles == null){
             const viewSelect = document.getElementById("viewTowards");
