@@ -60,7 +60,6 @@
         </div>
         <div class="left-bottom">
           <div class="galleryContent">
-
             <div class="mapControlsButtons">
               <button
                 class="userButton mapButton"
@@ -72,7 +71,7 @@
                 class="userButton mapButton"
                 onclick="experience.birdsEye.setBirdsEyeCamera()"
               >
-               <!-- <i class="fa fa-arrow-up fa-spin"></i> -->
+                <!-- <i class="fa fa-arrow-up fa-spin"></i> -->
                 <i class="fa fa-shower" style="font-size: 18px"></i>
               </button>
               <button
@@ -90,11 +89,11 @@
               </button>
 
               <button
-              class="userButton mapButton"
-              onclick="experience.birdsEye.addStreetPlane()"
-            >
-              <i class="fa fa-road" style="font-size: 18px"></i>
-            </button>
+                class="userButton mapButton"
+                onclick="experience.birdsEye.addStreetPlane()"
+              >
+                <i class="fa fa-road" style="font-size: 18px"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -124,7 +123,6 @@
               <svg id="overlay-svg-pcp"></svg>
             </div>
             <div id="controls-pcp-building" style="display: none">
-
               <select id="controlsSelection-dropdown-2">
                 <option value="facade">Facade</option>
                 <option value="query">Query</option>
@@ -132,21 +130,26 @@
 
               <!-- <input type="checkbox" id="toogle-building-to-semantics-checkbox"> -->
 
-
               <label
                 for="building-query-checkbox"
                 style="
                   margin-left: 1em;
                   display: inline-flex;
                   align-items: center;
-                ">
-                <input type="checkbox" id="building-query-checkbox"
-                onclick="experience.raycaster.changeFacadeThematicFollowingPcpQuery()"/>
+                "
+              >
+                <input
+                  type="checkbox"
+                  id="building-query-checkbox"
+                  onclick="experience.raycaster.changeFacadeThematicFollowingPcpQuery()"
+                />
                 <span style="margin-left: 0.3em">Building View Query</span>
               </label>
               <label for="viewTowards">View Towards:</label>
-              <select id="viewTowards"
-              onchange="experience.raycaster.changeFacadeThematic()">
+              <select
+                id="viewTowards"
+                onchange="experience.raycaster.changeFacadeThematic()"
+              >
                 <option value="building">Building</option>
                 <option value="water">Water</option>
                 <option value="road">Road</option>
@@ -158,7 +161,7 @@
               </select>
               <button
                 id="remove-facades"
-                class="userButton"
+                class="userButton2"
                 style="margin-left: 1em"
                 onclick="experience.raycaster.removeTilesFromScene()"
               >
@@ -176,7 +179,6 @@
             </div>
 
             <div id="controls-pcp">
-
               <!-- <input type="checkbox" id="toogle-semantics-to-building-checkbox"> -->
               <select id="controlsSelection-dropdown-1">
                 <option value="facade">Facade</option>
@@ -199,7 +201,11 @@
                   align-items: center;
                 "
               >
-                <input type="checkbox" id="plane-checkbox" onchange="experience.birdsEye.togglePlane()"/>
+                <input
+                  type="checkbox"
+                  id="plane-checkbox"
+                  onchange="experience.birdsEye.togglePlane()"
+                />
 
                 <span style="margin-left: 0.3em">Plane</span>
               </label>
@@ -208,7 +214,7 @@
                 class="userButton"
                 style="margin-left: 1em"
                 onclick="experience.world.callQueryViewPoints()"
-                >
+              >
                 <!-- onclick="handleQueryViewpointsClick()" -->
                 Query Viewpoints
               </button>
@@ -260,7 +266,7 @@
         window.d3 = d3;
       }
     </script> -->
-    
+
     <!-- Multithumb Slider Script -->
     <script></script>
     <script></script>
@@ -268,7 +274,6 @@
   <script src="https://d3js.org/d3.v2.js"></script>
   <script type="module" src="parallel.js"></script>
   <script type="module" src="scatter.js"></script>
-
 
   <script type="module" src="./script.js"></script>
 </html>

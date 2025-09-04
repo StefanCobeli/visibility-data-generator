@@ -1,256 +1,331 @@
-import Experience from '../Experience'
-import Loaders from '../Utils/Loaders'
-import Lights from '../Lights'
-import City from './City'
-import ParticleHelper from '../Utils/ParticleHelper'
-import { normalizeGoal } from '../Utils/helpers'
-import Histogram from '../D3Charts/Histogram/Histogram'
-import PovWorld from '../povWorld'
-import { MAX_POV_AMOUNT } from '../Utils/constants'
+import Experience from "../Experience";
+import Loaders from "../Utils/Loaders";
+import Lights from "../Lights";
+import City from "./City";
+import ParticleHelper from "../Utils/ParticleHelper";
+import { normalizeGoal } from "../Utils/helpers";
+import Histogram from "../D3Charts/Histogram/Histogram";
+import PovWorld from "../povWorld";
+import { MAX_POV_AMOUNT } from "../Utils/constants";
 // import HiddenMap from '../D3Charts/HiddenMap/HiddenMap'
-import { predefinedFormulaLibrary } from '../D3Charts/DefinePerceptionIndex/predefinedPerceptions'
+import { predefinedFormulaLibrary } from "../D3Charts/DefinePerceptionIndex/predefinedPerceptions";
 // import { handleQueryViewpointsClick } from "../../parallel"
 
-import { handleQueryViewpointsClick, myFunction} from '../../parallel'
+import { handleQueryViewpointsClick, myFunction } from "../../parallel";
+
+import { setValue } from "../../store";
+
+import { getBrushedPoints, onBrushedPoints } from "../../store.js";
 
 export default class World {
-    constructor() {
+  constructor() {
+    onBrushedPoints((v) => {
+      console.log("Brushed points:", v);
+      this.updatePovInterfaceAfterBrushOnHistogramNewKazi(v);
+      // this.displayGlobalLocations(v);
+    });
 
-        this.experience = new Experience()
-        this.scene = this.experience.scene
-        this.visibilityEncoderService = this.experience.visibilityEncoderService
-        this.gui = this.experience.gui
-        this.birdsEye = this.experience.birdsEye
+    this.gallery = null;
 
-        this.particleHelper = new ParticleHelper()
-        this.hiddenMap = null //new HiddenMap()
-        // this.hiddenMap      = this.experience.hiddenMap;
+    this.experience = new Experience();
+    this.scene = this.experience.scene;
+    this.visibilityEncoderService = this.experience.visibilityEncoderService;
+    this.gui = this.experience.gui;
+    this.birdsEye = this.experience.birdsEye;
 
-        this.histogram = new Histogram()
+    this.particleHelper = new ParticleHelper();
+    this.hiddenMap = null; //new HiddenMap()
+    // this.hiddenMap      = this.experience.hiddenMap;
 
-        this.loaders = new Loaders()
+    this.histogram = new Histogram();
 
-        this.lights = new Lights()
-        this.city = new City()
-        this.buildingMeshes = this.city.buildingMeshes
+    this.loaders = new Loaders();
 
-        this.city.loadModels()
+    this.lights = new Lights();
+    this.city = new City();
+    this.buildingMeshes = this.city.buildingMeshes;
 
-        this.scene.add(this.lights.directionalLightA)
-        this.scene.add(this.lights.directionalLightB)
-        this.scene.add(this.lights.ambientLight)
+    this.city.loadModels();
 
-        this.queryParameters = {};
-        this.queryLocationParameters = {
-            numLocations: {
-                value: 5
-            },
+    this.scene.add(this.lights.directionalLightA);
+    this.scene.add(this.lights.directionalLightB);
+    this.scene.add(this.lights.ambientLight);
+
+    this.queryParameters = {};
+    this.queryLocationParameters = {
+      numLocations: {
+        value: 5,
+      },
+    };
+    this.openessParameters = {};
+    this.isPerception = false;
+    this.initializeOpenessParameters();
+    this.setGUI();
+  }
+  setQueryParameters(dictionary) {
+    this.queryParameters = {};
+    this.isPerception = false;
+    dictionary.forEach((val) => {
+      const name = val["name"].toLowerCase();
+      const percentage = val["value"] / 100;
+      this.queryParameters[name] = percentage;
+    });
+    // console.log(this.queryParameters);
+  }
+  initializeOpenessParameters() {
+    const slidersRows = document.getElementsByClassName("sliderRow");
+
+    for (let j = 0; j < slidersRows.length; j++) {
+      for (let i = 0; i < slidersRows[j].children.length; i++) {
+        if (
+          slidersRows[j].children[i].nodeName == "INPUT" &&
+          slidersRows[j].children[i].type == "range"
+        ) {
+          // console.log(slidersRows[j].children[i].id);
+          this.openessParameters[slidersRows[j].children[i].id] =
+            parseInt(slidersRows[j].children[i].value) / 100;
         }
-        this.openessParameters = {}
-        this.isPerception = false
-        this.initializeOpenessParameters()
-        this.setGUI()
+      }
     }
-    setQueryParameters(dictionary) {
-        this.queryParameters = {};
-        this.isPerception = false
-        dictionary.forEach(val => {
-            const name = val['name'].toLowerCase()
-            const percentage = val['value'] / 100;
-            this.queryParameters[name] = percentage;
-        })
-        // console.log(this.queryParameters);
+    // console.log(this.openessParameters);
+  }
+  getOpenessParameters(value, id) {
+    this.isPerception = true;
+    this.queryParameters[id] = parseInt(value) / 100;
+  }
+  setOpenessParameters() {
+    this.isPerception = true;
+    this.queryParameters = structuredClone(this.openessParameters);
+  }
+  removeFromParameter(key) {
+    if (this.queryParameters.hasOwnProperty(key)) {
+      delete this.queryParameters[key];
+      document.querySelector(`label[for="${key}"]`).remove();
+      document.querySelector(`#${key}-form`).remove();
     }
-    initializeOpenessParameters() {
-        const slidersRows = document.getElementsByClassName('sliderRow')
+    console.log(this.queryParameters);
+  }
+  callQueryViewPoints() {
+    myFunction(); // Works now!
+    let kaziQuery = handleQueryViewpointsClick();
+    // console.log({ kaziQuery }, "{{{{}}}}}");
+    var element = document.getElementById("plane-checkbox");
+    if (element.checked == true) {
+      this.callQueryLocationOnPlane();
+    } else {
+      this.callQueryLocation();
+    }
+  }
+  callQueryLocation() {
+    this.queryLocationParameters.numLocations.value = parseInt(
+      document.querySelector("#numLocations").value
+    );
 
-        for (let j = 0; j < slidersRows.length; j++) {
-            for (let i = 0; i < slidersRows[j].children.length; i++) {
-                if (slidersRows[j].children[i].nodeName == "INPUT" && slidersRows[j].children[i].type == "range") {
-                    console.log(slidersRows[j].children[i].id);
-                    this.openessParameters[slidersRows[j].children[i].id] = parseInt(slidersRows[j].children[i].value) / 100
-                }
-            }
-        }
-        console.log(this.openessParameters);
-    }
-    getOpenessParameters(value, id) {
-        this.isPerception = true
-        this.queryParameters[id] = parseInt(value) / 100
-    }
-    setOpenessParameters() {
-        this.isPerception = true
-        this.queryParameters = structuredClone(this.openessParameters)
-    }
-    removeFromParameter(key) {
-        if (this.queryParameters.hasOwnProperty(key)) {
-            delete this.queryParameters[key]
-            document.querySelector(`label[for="${key}"]`).remove()
-            document.querySelector(`#${key}-form`).remove()
-        }
-        console.log(this.queryParameters);
-    }
-    callQueryViewPoints() {
-        myFunction(); // Works now!
-        let kaziQuery = handleQueryViewpointsClick()
-        console.log({kaziQuery})
-        var element = document.getElementById('plane-checkbox');
-        if (element.checked == true) {
-            this.callQueryLocationOnPlane()
-        } else {
-            this.callQueryLocation()
-        }
-    }
-    callQueryLocation() {
-        this.queryLocationParameters.numLocations.value = parseInt(document.querySelector('#numLocations').value)
-        
-        let pcpInput = handleQueryViewpointsClick()
-        let pcpGoals = pcpInput.f_xyz
-        console.log({pcpGoals})
-        console.log(this.queryParameters)
-        
-        Object.keys(this.queryParameters).forEach(key => {
-            if (! pcpGoals.hasOwnProperty(key)){
-                pcpGoals[key] = 0;
-            }
-             // Update the value
-        });
-        // this.visibilityEncoderService.queryLocation(
-        //     this.queryLocationParameters.numLocations.value,
-        //     1,
-        //     this.queryParameters
-        // )
-        this.visibilityEncoderService.queryLocation(
-            this.queryLocationParameters.numLocations.value,
-            1,
-            pcpGoals
-        )
-            .then(res => {
-                console.log(res);
-                this.updatePovInterface(res);
-                this.experience.queryLocationParticles = this.particleHelper.plotParticles(res.data)
-            })
-            .catch(err => {
-                console.error(err);
-            })
-    }
+    let pcpInput = handleQueryViewpointsClick();
+    let pcpGoals = pcpInput.f_xyz;
+    // console.log({ pcpGoals });
+    // console.log(this.queryParameters);
 
-    callQueryLocationOnPlane() {
-        const plane = this.birdsEye.plane
-        const planeScale = plane.scale
-        const planeCenter = plane.position
-        const planeWidth = plane.geometry.parameters.width * planeScale.x
-        const planeHeight = plane.geometry.parameters.height * planeScale.z
+    Object.keys(this.queryParameters).forEach((key) => {
+      if (!pcpGoals.hasOwnProperty(key)) {
+        pcpGoals[key] = 0;
+      }
+      // Update the value
+    });
+    // this.visibilityEncoderService.queryLocation(
+    //     this.queryLocationParameters.numLocations.value,
+    //     1,
+    //     this.queryParameters
+    // )
+    this.visibilityEncoderService
+      .queryLocation(
+        this.queryLocationParameters.numLocations.value,
+        1,
+        pcpGoals
+      )
+      .then((res) => {
+        // console.log(res);
+        this.updatePovInterface(res);
+        this.experience.queryLocationParticles =
+          this.particleHelper.plotParticles(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
 
-        const planeDirections = this.birdsEye.getPlaneDirections()
-        let goals = this.queryParameters
-        if (this.isPerception) {
-            const opennessPayload = {}
-            //Kazi passing query parameters to backed
-            for (const key in this.queryParameters) {
-                const expression = predefinedFormulaLibrary[key]["expression"]
-                const value = this.queryParameters[key]
-                opennessPayload[key] = {}
-                opennessPayload[key][expression] = value
-            }
-            goals = opennessPayload
-        }
-        // this.visibilityEncoderService.queryLocationOnPlane({
-        //     numLocations: parseInt(document.querySelector('#numLocations').value),
-        //     seed: 20,
-        //     goals: goals,
-        //     pointOnPlane: [...planeCenter],
-        //     direction1: planeDirections[0],
-        //     direction2: planeDirections[1],
-        //     radius: [planeWidth, planeHeight]
-        // })
-        let pcpInput = handleQueryViewpointsClick()
-        let pcpGoals = pcpInput.f_xyz
-        console.log({goals})
-        console.log({pcpGoals})
+  callQueryLocationOnPlane() {
+    const plane = this.birdsEye.plane;
+    const planeScale = plane.scale;
+    const planeCenter = plane.position;
+    const planeWidth = plane.geometry.parameters.width * planeScale.x;
+    const planeHeight = plane.geometry.parameters.height * planeScale.z;
 
-        this.visibilityEncoderService.queryLocationOnPlane({
-            numLocations: parseInt(document.querySelector('#numLocations').value),
-            seed: 20,
-            goals: pcpGoals,
-            pointOnPlane: [...planeCenter],
-            direction1: planeDirections[0],
-            direction2: planeDirections[1],
-            radius: [planeWidth, planeHeight]
-        })
-            .then(res => {
-                console.log(res);
-                this.updatePovInterface(res);
-                this.experience.queryLocationParticles = this.particleHelper.plotParticles(res.data)
-                //Update Latent Features 2D map:
-                console.log("Updating query on 2d scatter plot.")
-                // this.hiddenMap.renderQueryOnHiddenMap(res.data)
-            })
-            .catch(err => {
-                console.error(err);
-            })
+    const planeDirections = this.birdsEye.getPlaneDirections();
+    let goals = this.queryParameters;
+    if (this.isPerception) {
+      const opennessPayload = {};
+      //Kazi passing query parameters to backed
+      for (const key in this.queryParameters) {
+        const expression = predefinedFormulaLibrary[key]["expression"];
+        const value = this.queryParameters[key];
+        opennessPayload[key] = {};
+        opennessPayload[key][expression] = value;
+      }
+      goals = opennessPayload;
     }
+    // this.visibilityEncoderService.queryLocationOnPlane({
+    //     numLocations: parseInt(document.querySelector('#numLocations').value),
+    //     seed: 20,
+    //     goals: goals,
+    //     pointOnPlane: [...planeCenter],
+    //     direction1: planeDirections[0],
+    //     direction2: planeDirections[1],
+    //     radius: [planeWidth, planeHeight]
+    // })
+    let pcpInput = handleQueryViewpointsClick();
+    let pcpGoals = pcpInput.f_xyz;
+    // console.log({ goals });
+    // console.log({ pcpGoals });
 
-    resetAndCreatePovs(res) {
-        if (res == null) return;
-        console.log(res);
-        PovWorld.disposeAllPovWorlds();
-        this.experience.povWorld.forEach(world => world.disposeWorld())
-        this.experience.povWorld = []
-        const povAmount = Math.min(res.data?.length, MAX_POV_AMOUNT);
-        // const povAmount = Math.min(res.length, MAX_POV_AMOUNT);
-        for (let i = 0; i < povAmount; i++) {
-            this.experience.povWorld.push(new PovWorld(i))
-        }
+    this.visibilityEncoderService
+      .queryLocationOnPlane({
+        numLocations: parseInt(document.querySelector("#numLocations").value),
+        seed: 20,
+        goals: pcpGoals,
+        pointOnPlane: [...planeCenter],
+        direction1: planeDirections[0],
+        direction2: planeDirections[1],
+        radius: [planeWidth, planeHeight],
+      })
+      .then((res) => {
+        // console.log(res, "+++");
+        this.updatePovInterface(res);
+        this.experience.queryLocationParticles =
+          this.particleHelper.plotParticles(res.data);
+        //Update Latent Features 2D map:
+        // console.log("Updating query on 2d scatter plot.");
+        // this.hiddenMap.renderQueryOnHiddenMap(res.data);
+        // console.log(res.data, "+++");
+        setValue(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  resetAndCreatePovs(res) {
+    if (res == null) return;
+    // console.log(res);
+    PovWorld.disposeAllPovWorlds();
+    this.experience.povWorld.forEach((world) => world.disposeWorld());
+    this.experience.povWorld = [];
+    const povAmount = Math.min(res.data?.length, MAX_POV_AMOUNT);
+    // const povAmount = Math.min(res.length, MAX_POV_AMOUNT);
+    for (let i = 0; i < povAmount; i++) {
+      this.experience.povWorld.push(new PovWorld(i));
     }
+  }
 
-    updatePovInterface(res) {
-        if (res == null) return;
-        this.resetAndCreatePovs(res);
-        this.experience.povWorld.forEach((world) => {
-            world.maxLocations = res.data.length
-            world.updateViewPort(res.data)
-            for (const gui of world.gui.viewportFolder.controllers) {
-                gui.max(res.data.length - 1)
-                gui.updateDisplay()
-            }
-        })
-    }
+  updatePovInterface(res) {
+    if (res == null) return;
+    this.resetAndCreatePovs(res);
+    console.log({ res }, "plotting gallery");
+    this.gallery = res;
+    this.experience.povWorld.forEach((world) => {
+      world.maxLocations = res.data.length;
+      world.updateViewPort(res.data);
+      for (const gui of world.gui.viewportFolder.controllers) {
+        gui.max(res.data.length - 1);
+        gui.updateDisplay();
+      }
+    });
+  }
 
-    updatePovInterfaceAfterBrushOnHistogram(res) {
-        if (res == null) return;
-        console.log({ res })
-        this.resetAndCreatePovs(res);
-        this.experience.povWorld.forEach((world) => {
-            world.updateViewPort(res.data)
-            for (const gui of world.gui.viewportFolder.controllers) {
-                gui.max(res.length - 1)
-                gui.updateDisplay()
-            }
-        })
-    }
+  updatePovInterfaceAfterBrushOnHistogramNewKazi(v) {
+    let res_ = this.gallery;
 
-    setGUI() {
-        this.gui.queryPositionFolder.add(this.queryLocationParameters.numLocations, 'value').min(1).max(10000).step(1).name('numLocations')
+    if (res_ == null) return;
+    const tolerance = 1e-6;
 
-        // this.gui.queryPositionFolder.add(this.queryLocationParameters.building, 'value').min(0).max(1).step(0.01).name('building')
-        // this.gui.queryPositionFolder.add(this.queryLocationParameters.water, 'value').min(0).max(1).step(0.01).name('water')
-        // this.gui.queryPositionFolder.add(this.queryLocationParameters.tree, 'value').min(0).max(1).step(0.01).name('tree')
-        // this.gui.queryPositionFolder.add(this.queryLocationParameters.sky, 'value').min(0).max(1).step(0.01).name('sky')
+    const filteredData = res_.data.filter((item) => {
+      return v.some(
+        (pt) =>
+          Math.abs(pt.x - item.PCA[0]) < tolerance &&
+          Math.abs(pt.y - item.PCA[1]) < tolerance
+      );
+    });
 
-        this.gui.queryPositionFolder.add({
-            callQueryLocation: () => {
-                this.callQueryLocation()
-            }
-        }, 'callQueryLocation')
+    // clone the full response object, but override `.data`
+    const filteredRes_ = {
+      ...res_,
+      data: filteredData,
+    };
 
-        this.gui.queryPositionFolder.add({
-            callQueryLocationOnPlane: () => {
-                this.callQueryLocationOnPlane()
-            }
-        }, 'callQueryLocationOnPlane')
-    }
-    update() {
-        this.city.update()
-    }
+    this.resetAndCreatePovs(filteredRes_);
+
+    this.experience.povWorld.forEach((world) => {
+      // world.maxLocations = filteredRes_.data.length;
+      world.updateViewPort(filteredRes_.data);
+      for (const gui of world.gui.viewportFolder.controllers) {
+        gui.max(filteredRes_.data.length - 1);
+        gui.updateDisplay();
+      }
+    });
+
+    console.log(filteredRes_, "////");
+
+    this.experience.queryLocationParticles = this.particleHelper.plotParticles(
+      filteredRes_.data
+    );
+  }
+
+  updatePovInterfaceAfterBrushOnHistogram(res) {
+    if (res == null) return;
+    console.log({ res }, "plotting gallery");
+
+    this.resetAndCreatePovs(res);
+    this.experience.povWorld.forEach((world) => {
+      world.updateViewPort(res.data);
+      for (const gui of world.gui.viewportFolder.controllers) {
+        gui.max(res.length - 1);
+        gui.updateDisplay();
+      }
+    });
+  }
+
+  setGUI() {
+    this.gui.queryPositionFolder
+      .add(this.queryLocationParameters.numLocations, "value")
+      .min(1)
+      .max(10000)
+      .step(1)
+      .name("numLocations");
+
+    // this.gui.queryPositionFolder.add(this.queryLocationParameters.building, 'value').min(0).max(1).step(0.01).name('building')
+    // this.gui.queryPositionFolder.add(this.queryLocationParameters.water, 'value').min(0).max(1).step(0.01).name('water')
+    // this.gui.queryPositionFolder.add(this.queryLocationParameters.tree, 'value').min(0).max(1).step(0.01).name('tree')
+    // this.gui.queryPositionFolder.add(this.queryLocationParameters.sky, 'value').min(0).max(1).step(0.01).name('sky')
+
+    this.gui.queryPositionFolder.add(
+      {
+        callQueryLocation: () => {
+          this.callQueryLocation();
+        },
+      },
+      "callQueryLocation"
+    );
+
+    this.gui.queryPositionFolder.add(
+      {
+        callQueryLocationOnPlane: () => {
+          this.callQueryLocationOnPlane();
+        },
+      },
+      "callQueryLocationOnPlane"
+    );
+  }
+  update() {
+    this.city.update();
+  }
 }

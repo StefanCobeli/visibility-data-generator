@@ -2,10 +2,9 @@
 // Copyright (c) 2012, Kai Chang
 // Released under the BSD License: http://opensource.org/licenses/BSD-3-Clause
 
-// import World from "./Experience/World/World";
-// let worldClass = new World();
+// import Experience from "./Experience/Experience";
 
-console.log("running pcp...")
+// console.log("running pcp...");
 const categoryOptions = {
   semantics: [
     "building",
@@ -38,7 +37,6 @@ window.dataFiles = {
   building: "test_set_buildings_as_query.json",
   perception: "test_set_perception_as_query.json",
 };
-
 
 // let currentCategory = "semantics";
 window.currentCategory = "semantics";
@@ -115,7 +113,7 @@ function setupHeaderEvents() {
   });
 }
 
-function checkboxEventListenet(){
+function checkboxEventListenet() {
   /*
       const controlsQueryCheckbox1 = document.getElementById('toogle-semantics-to-building-checkbox');
       const controlsQueryCheckbox2 = document.getElementById('toogle-building-to-semantics-checkbox');
@@ -140,33 +138,31 @@ function checkboxEventListenet(){
       } 
     )
       */
-    ////////////////////////////////////////
-    const controlsQueryDropDown1 = document.getElementById('controlsSelection-dropdown-1');
-    const controlsQueryDropDown2 = document.getElementById('controlsSelection-dropdown-2');
-    controlsQueryDropDown1.addEventListener("change", 
-        async (e) => {
-        console.log("first dropdown box was changed.")
-        console.log("facade.")
-        document.getElementById("controls-pcp").style.display = "none";
-        document.getElementById("controls-pcp-building").style.display = "flex";
-        controlsQueryDropDown1.value = "query"
-        controlsQueryDropDown2.value = "facade"
-      } 
-    )
-    controlsQueryDropDown2.addEventListener("change", 
-      async (e) => {
-      console.log("second dropdown box was changed.")
+  ////////////////////////////////////////
+  const controlsQueryDropDown1 = document.getElementById(
+    "controlsSelection-dropdown-1"
+  );
+  const controlsQueryDropDown2 = document.getElementById(
+    "controlsSelection-dropdown-2"
+  );
+  controlsQueryDropDown1.addEventListener("change", async (e) => {
+    // console.log("first dropdown box was changed.");
+    // console.log("facade.");
+    document.getElementById("controls-pcp").style.display = "none";
+    document.getElementById("controls-pcp-building").style.display = "flex";
+    controlsQueryDropDown1.value = "query";
+    controlsQueryDropDown2.value = "facade";
+  });
+  controlsQueryDropDown2.addEventListener("change", async (e) => {
+    // console.log("second dropdown box was changed.");
 
-      console.log("query.")
-      document.getElementById("controls-pcp").style.display = "flex" ;
-      document.getElementById("controls-pcp-building").style.display = "none";
-      controlsQueryDropDown1.value = "query"
-      controlsQueryDropDown2.value = "facade"
-    } 
-    )
-  
+    // console.log("query.");
+    document.getElementById("controls-pcp").style.display = "flex";
+    document.getElementById("controls-pcp-building").style.display = "none";
+    controlsQueryDropDown1.value = "query";
+    controlsQueryDropDown2.value = "facade";
+  });
 }
-
 
 function toggleControls(category) {
   document.getElementById("controls-pcp").style.display =
@@ -478,7 +474,7 @@ function paths(selected, ctx, count) {
   d3.timer(animloop);
 }
 
- export function handleQueryViewpointsClick() {
+export function handleQueryViewpointsClick() {
   if (brushSelected.length !== pcp_data_length) {
     // console.log("Selected data: ", brushSelected);
 
@@ -540,11 +536,10 @@ function paths(selected, ctx, count) {
       seed: "",
     };
 
-    console.log("Constructed Query Object:", queryObject);
+    // console.log("Constructed Query Object:", queryObject);
     return queryObject;
   }
 }
-
 
 // transition ticks for reordering, rescaling and inverting
 function update_ticks(d, extent) {
@@ -808,7 +803,7 @@ function add_axis(axisName) {
 
 // parallel.js
 export function myFunction() {
-  console.log("Hello from parallel.js!");
+  // console.log("Hello from parallel.js!");
 }
 
-console.log("imported pcp!")
+// console.log("imported pcp!");

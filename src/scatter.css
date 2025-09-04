@@ -15,7 +15,7 @@
 }
 
 .selected-scatter {
-  fill: #d95f02 !important; /* Highlight brushed points */
+  fill: #7570b3 !important; /* Highlight brushed points */
 }
 .controls-scatter label {
   display: flex;

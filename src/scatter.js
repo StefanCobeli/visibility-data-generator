@@ -1,4 +1,25 @@
+import {
+  onValue,
+  getValue,
+  setBrushedPoints,
+  onBrushedPoints,
+} from "./store.js";
+
+// get current (if already set)
+console.log("current:", getValue());
+
+// react to future updates
+onValue((v) => {
+  console.log("received:", v, "______+++______");
+  if (scatterCurProjection == "PCA") {
+    setActiveBtnProjection("PCA");
+    updateScatter2(v);
+  }
+});
+
 let scatterCurProjection = "PCA";
+let scatterGroup;
+let s_ids = [];
 
 const scatterBtnPCA = document.getElementById("btn-pca");
 const scatterBtnUMAP = document.getElementById("btn-umap");
@@ -34,6 +55,8 @@ let svg_scatter = d3v7.select(svgElementScatter);
 let marginScatter = { top: 0, right: 0, bottom: 0, left: 0 };
 let lastTransformScatter = d3v7.zoomIdentity; // Remember zoom state globally
 let zoomEnabledScatter = true;
+let xScale, yScale;
+let brushedGalleryPoints = []; // Declare outside brush to store result
 
 // Wrapper to redraw the chart
 function drawScatter() {
@@ -46,7 +69,7 @@ function drawScatter() {
   updateProjection(scatterCurProjection, width, height);
 }
 
-window.drawScatter = drawScatter
+window.drawScatter = drawScatter;
 
 // Main function to create or update the scatter plot
 function updateProjection(projectionType, width, height) {
@@ -80,12 +103,12 @@ function updateProjection(projectionType, width, height) {
     const xPadding = (xExtent[1] - xExtent[0]) * 0.01;
     const yPadding = (yExtent[1] - yExtent[0]) * 0.01;
 
-    const xScale = d3v7
+    xScale = d3v7
       .scaleLinear()
       .domain([xExtent[0] - xPadding, xExtent[1] + xPadding])
       .range([pointRadius, innerWidth - pointRadius]);
 
-    const yScale = d3v7
+    yScale = d3v7
       .scaleLinear()
       .domain([yExtent[0] - yPadding, yExtent[1] + yPadding])
       .range([innerHeight - pointRadius, pointRadius]);
@@ -97,7 +120,7 @@ function updateProjection(projectionType, width, height) {
       .attr("width", innerWidth)
       .attr("height", innerHeight);
 
-    let scatterGroup = chart
+    scatterGroup = chart
       .append("g")
       .attr("clip-path", "url(#clip)")
       .attr("transform", lastTransformScatter);
@@ -133,26 +156,46 @@ function updateProjection(projectionType, width, height) {
       ])
       .on("brush", (event) => {
         if (!zoomEnabledScatter) {
-          const selection = event.selection;
-          if (!selection) {
-            return;
-          }
+          const sel = event.selection;
+          if (!sel) return;
 
-          const newXScale = lastTransformScatter.rescaleX(xScale);
-          const newYScale = lastTransformScatter.rescaleY(yScale);
+          const newX = lastTransformScatter.rescaleX(xScale);
+          const newY = lastTransformScatter.rescaleY(yScale);
+          const [[x0, y0], [x1, y1]] = sel;
 
-          const [[x0, y0], [x1, y1]] = selection;
-
-          points.classed("selected-scatter", (d) => {
-            const cx = newXScale(d.x);
-            const cy = newYScale(d.y);
+          const isInside = (d) => {
+            const cx = newX(d.x);
+            const cy = newY(d.y);
             return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
-          });
+          };
+
+          // 1) Color ONLY base points (everything except gallery points)
+          scatterGroup
+            .selectAll("circle:not(.gallery-point)")
+            .classed("selected-scatter", (d) => isInside(d));
+
+          // 2) Collect (but do NOT style) the gallery points inside brush
+          brushedGalleryPoints = scatterGroup
+            .selectAll("circle.gallery-point")
+            .filter((d) => isInside(d))
+            .data();
+
+          // console.log("Brushed gallery points:", brushedGalleryPoints);
+
+          setBrushedPoints(brushedGalleryPoints);
         }
       })
       .on("end", (event) => {
         if (!zoomEnabledScatter && !event.selection) {
-          points.classed("selected-scatter", false);
+          // Clear highlight ONLY on base points
+          scatterGroup
+            .selectAll("circle:not(.gallery-point)")
+            .classed("selected-scatter", false);
+
+          // Clear stored gallery selection
+          brushedGalleryPoints = [];
+          setBrushedPoints(brushedGalleryPoints);
+          // console.log("Brush cleared.");
         }
       });
 
@@ -195,14 +238,44 @@ window.addEventListener("resize", () => {
 
 window.updateScatter = function (selectedData) {
   const selectedIds = new Set(selectedData.map((d) => d.image_name || d.id));
+  s_ids = selectedIds;
 
-  d3v7
+  scatterGroup
     .selectAll("circle")
-    .attr("fill", (d) => {
-      return "#7570b3";
-    })
-    .attr(
-      "opacity",
-      (d) => (selectedIds.has(d.id) ? 0.25 : 0) // higher opacity for selected
-    );
+    .attr("fill", (d) => (d.isGallery ? "#d95f02" : "#7570b3"))
+    .attr("opacity", (d) => {
+      if (d.isGallery) return 1;
+      if (s_ids.has(d.id)) return 0.25;
+      return 0;
+    });
+};
+
+window.updateScatter2 = function (selectedData) {
+  scatterGroup?.selectAll("circle.gallery-point").remove();
+
+  selectedData.forEach((d, i) => {
+    scatterGroup
+      .append("circle") // <-- append to the zoomed group
+      .attr("class", "gallery-point") // for future cleanup if needed
+      .datum({
+        x: +d.PCA[0],
+        y: +d.PCA[1],
+        id: `gallery-${i}`,
+        isGallery: true,
+      })
+      .attr("cx", (d) => xScale(d.x))
+      .attr("cy", (d) => yScale(d.y))
+      .attr("r", 1.5);
+  });
+
+  const selectedIds = new Set(selectedData.map((d, i) => `gallery-${i}`));
+
+  scatterGroup
+    .selectAll("circle")
+    .attr("fill", (d) => (d.isGallery ? "#d95f02" : "#7570b3"))
+    .attr("opacity", (d) => {
+      if (selectedIds.has(d.id)) return 1;
+      if (s_ids.has(d.id)) return 0.25;
+      return 0;
+    });
 };
