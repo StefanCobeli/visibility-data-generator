@@ -15,13 +15,17 @@ import { handleQueryViewpointsClick, myFunction } from "../../parallel";
 
 import { setValue } from "../../store";
 
-import { getBrushedPoints, onBrushedPoints } from "../../store.js";
+import {
+  getBrushedPoints,
+  onBrushedPoints,
+  getProjection,
+} from "../../store.js";
 
 export default class World {
   constructor() {
     onBrushedPoints((v) => {
-      console.log("Brushed points:", v);
-      this.updatePovInterfaceAfterBrushOnHistogramNewKazi(v);
+      // console.log("Brushed points:", v);
+      this.updatePovInterfaceAfterBrushOnHistogramNewKazi(v, getProjection());
       // this.displayGlobalLocations(v);
     });
 
@@ -242,7 +246,7 @@ export default class World {
     });
   }
 
-  updatePovInterfaceAfterBrushOnHistogramNewKazi(v) {
+  updatePovInterfaceAfterBrushOnHistogramNewKazi(v, projection) {
     let res_ = this.gallery;
 
     if (res_ == null) return;
@@ -251,8 +255,8 @@ export default class World {
     const filteredData = res_.data.filter((item) => {
       return v.some(
         (pt) =>
-          Math.abs(pt.x - item.PCA[0]) < tolerance &&
-          Math.abs(pt.y - item.PCA[1]) < tolerance
+          Math.abs(pt.x - item[projection][0]) < tolerance &&
+          Math.abs(pt.y - item[projection][1]) < tolerance
       );
     });
 

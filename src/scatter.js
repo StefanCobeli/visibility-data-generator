@@ -1,9 +1,4 @@
-import {
-  onValue,
-  getValue,
-  setBrushedPoints,
-  onBrushedPoints,
-} from "./store.js";
+import { onValue, getValue, setBrushedPoints, setProjection } from "./store.js";
 
 // get current (if already set)
 console.log("current:", getValue());
@@ -11,13 +6,13 @@ console.log("current:", getValue());
 // react to future updates
 onValue((v) => {
   console.log("received:", v, "______+++______");
-  if (scatterCurProjection == "PCA") {
-    setActiveBtnProjection("PCA");
-    updateScatter2(v);
-  }
+
+  // setActiveBtnProjection("PCA");
+  updateScatter2(v, scatterCurProjection);
 });
 
 let scatterCurProjection = "PCA";
+setProjection("PCA");
 let scatterGroup;
 let s_ids = [];
 
@@ -28,6 +23,7 @@ scatterBtnPCA.addEventListener("click", () => {
   if (scatterCurProjection !== "PCA") {
     scatterCurProjection = "PCA";
     setActiveBtnProjection("PCA");
+    setProjection("PCA");
     drawScatter();
   }
 });
@@ -36,6 +32,7 @@ scatterBtnUMAP.addEventListener("click", () => {
   if (scatterCurProjection !== "UMAP") {
     scatterCurProjection = "UMAP";
     setActiveBtnProjection("UMAP");
+    setProjection("UMAP");
     drawScatter();
   }
 });
@@ -250,7 +247,7 @@ window.updateScatter = function (selectedData) {
     });
 };
 
-window.updateScatter2 = function (selectedData) {
+window.updateScatter2 = function (selectedData, currentProjection) {
   scatterGroup?.selectAll("circle.gallery-point").remove();
 
   selectedData.forEach((d, i) => {
@@ -258,8 +255,8 @@ window.updateScatter2 = function (selectedData) {
       .append("circle") // <-- append to the zoomed group
       .attr("class", "gallery-point") // for future cleanup if needed
       .datum({
-        x: +d.PCA[0],
-        y: +d.PCA[1],
+        x: +d[currentProjection][0], // <-- dynamic projection
+        y: +d[currentProjection][1],
         id: `gallery-${i}`,
         isGallery: true,
       })

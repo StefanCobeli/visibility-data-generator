@@ -55,10 +55,10 @@ export const collada_models = [
     name: "model-2-1",
     path: "/data/NYC/collada_model/model-2-1.dae",
   },
-  {
-    name: "model-2-2",
-    path: "/data/NYC/collada_model/model-2-2.dae",
-  },
+  // {
+  //   name: "model-2-2",
+  //   path: "/data/NYC/collada_model/model-2-2.dae",
+  // },
   // {
   //   name: "model-2-3",
   //   path: "/data/NYC/collada_model/model-2-3.dae",

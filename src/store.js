@@ -33,3 +33,20 @@ export function onBrushedPoints(fn) {
 export function getBrushedPoints() {
   return brushedGalleryPoints;
 }
+
+let projection = null;
+const projectionListeners = new Set();
+
+export function setProjection(v) {
+  projection = v;
+  projectionListeners.forEach((fn) => fn(v));
+}
+
+export function onProjection(fn) {
+  projectionListeners.add(fn);
+  return () => projectionListeners.delete(fn);
+}
+
+export function getProjection() {
+  return projection;
+}
